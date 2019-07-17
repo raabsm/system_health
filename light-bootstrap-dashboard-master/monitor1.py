@@ -71,7 +71,9 @@ def application():
     try:
         urls = [(r"/", jsHandler),
                 (r"/assets/css/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/css"},),
-                (r"/style/(.*)", tornado.web.StaticFileHandler, {"path": "./style"},)]
+                (r"/assets/js/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/js"},),
+                (r"/assets/js/core/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/js/core"},),
+                (r"/assets/js/plugins/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/js/plugins"},)]
         return tornado.web.Application(urls, debug=True)
     except:
         print("Application not working")
