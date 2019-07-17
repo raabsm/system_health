@@ -53,14 +53,14 @@ class jsHandler(tornado.web.RequestHandler):
 # renders the JSON file at the url on a local page
 class infoHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write(""" retrive and display all the required data """)
+        self.write(""" retrieve and display all the required data """)
 
 
 # launch url according to input path
 def application():
     try:
         urls = [(r"/", jsHandler),
-                (r"/assets/(.*)", tornado.web.StaticFileHandler, {"path": "./assets"},),
+                (r"/jscode/(.*)", tornado.web.StaticFileHandler, {"path": "./jscode"},),
                 (r"/style/(.*)", tornado.web.StaticFileHandler, {"path": "./style"},)]
         return tornado.web.Application(urls, debug=True)
     except:
