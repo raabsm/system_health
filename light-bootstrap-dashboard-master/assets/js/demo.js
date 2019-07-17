@@ -4,11 +4,17 @@ $().ready(function() {
 
     $.getJSON("https://api.openweathermap.org/data/2.5/find?q=London&appid=85c972736ac42ab4f23bf7c0fd3ca4b6", function(result){
          var responseTime = (new Date().getTime() - start.getTime()) / 1000;
+
+
+
         $("#weather").append("<br><p>Weather in " + result["list"][0]["name"] + ", " +
             result["list"][0]["sys"]["country"] + "</p>"
              + "<p>Temperature: " + (result["list"][0]["main"]["temp"] - 273.15).toFixed(2).toString()
              + " degrees</p><p>Wind: "+ result['list'][0]["wind"]["speed"].toString() + " m/s</><p>Query time: " + start
              + "</p><p>" + "Response time: " + responseTime + " seconds</p>");
+
+
+
         responses.push(responseTime)
     });
     $sidebar = $('.sidebar');

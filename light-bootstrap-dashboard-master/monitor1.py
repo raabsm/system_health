@@ -13,6 +13,7 @@ tornado.options.define('port', default=8888, help='port to listen on')
 
 # Create a logging instance // https://do
 
+
 # return an object containing info for each widget
 def widget_properties(name, url):
     try:
@@ -27,6 +28,15 @@ def widget_properties(name, url):
     except:
         print("Couldn't get widget properties")
 
+
+# def DBconnection():
+#     prod_connection_string = "dbname='skywatch_prod' user='skywatch@skywatchdb-prod.postgres.database.azure.com' " \
+#                              "host='skywatchdb-prod.postgres.database.azure.com' password='SkyWatch1234'"
+#
+#     conn = psycopg2.connect(
+#         prod_connection_string,
+#         sslmode='require')
+#     cursor = conn.cursor()
 
 # call required function based on input name
 # def widget_specs(name, r, stamp, response_time):
@@ -51,9 +61,9 @@ class jsHandler(tornado.web.RequestHandler):
 
 
 # renders the JSON file at the url on a local page
-class infoHandler(tornado.web.RequestHandler):
+class revenueHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write(""" retrieve and display all the required data """)
+        """ TO DO """
 
 
 # launch url according to input path
