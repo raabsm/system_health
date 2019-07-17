@@ -70,7 +70,7 @@ class revenueHandler(tornado.web.RequestHandler):
 def application():
     try:
         urls = [(r"/", jsHandler),
-                (r"/assets/(.*)", tornado.web.StaticFileHandler, {"path": "./assets"},),
+                (r"/assets/css/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/css"},),
                 (r"/style/(.*)", tornado.web.StaticFileHandler, {"path": "./style"},)]
         return tornado.web.Application(urls, debug=True)
     except:
