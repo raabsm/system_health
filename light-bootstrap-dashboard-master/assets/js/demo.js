@@ -17,14 +17,10 @@ $().ready(function() {
     });
 
     setInterval(function() {
-    $.getJSON("/profiles", function(result){
-        $("#num_users").append("<br><p>Number of users currently: " + result['num_profiles'] + "</p>");
-    });
-}, 1000);
-
-
-
-
+        $.getJSON("/profiles", function(result){
+            document.getElementById("num_users").innerHTML = "<br><p>Number of users currently: " + result['num_profiles'] + "</p>";
+        });
+    }, 1000);
     $sidebar = $('.sidebar');
     $sidebar_img_container = $sidebar.find('.sidebar-background');
 

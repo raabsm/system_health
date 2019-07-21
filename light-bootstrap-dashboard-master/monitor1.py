@@ -6,13 +6,9 @@ import datetime
 import requests
 import json
 import DBConnection
-import logging
-from pymongo import MongoClient
 
 
 tornado.options.define('port', default=8888, help='port to listen on')
-
-# Create a logging instance // https://do
 
 
 # return an object containing info for each widget
@@ -34,18 +30,6 @@ def get_number_profiles():
     query = 'SELECT COUNT(id) FROM "User"."profiles"'
     response = DBConnection.get_all_responses(query)
     return response[0][0]
-
-# call required function based on input name
-# def widget_specs(name, r, stamp, response_time):
-#     if name == "widget1":
-#         topost.insert_one({"widget1": {"stamp": stamp, "responsetime": response_time}})
-#         return weather_widget(r)
-#     elif name == "catfacts":
-#         topost.insert_one({"catfacts": {"stamp": stamp, "responsetime": response_time}})
-#         return cat_facts(r)
-#     elif name == "quote":
-#         topost.insert_one({"quote": {"stamp": stamp, "responsetime": response_time}})
-#         return quote(r)
 
 
 # render the page; let jQuery do the work
