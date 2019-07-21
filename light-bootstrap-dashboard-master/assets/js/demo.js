@@ -1,26 +1,46 @@
 $().ready(function() {
-    var start = new Date();
-    var responses = [];
 
-    $.getJSON("https://api.openweathermap.org/data/2.5/find?q=London&appid=85c972736ac42ab4f23bf7c0fd3ca4b6", function(result){
-         var responseTime = (new Date().getTime() - start.getTime()) / 1000;
+    var user_count = 0;
+    var time = null;
 
-
-
-        $("#weather").append("<br><p>Weather in " + result["list"][0]["name"] + ", " +
-            result["list"][0]["sys"]["country"] + "</p>"
-             + "<p>Temperature: " + (result["list"][0]["main"]["temp"] - 273.15).toFixed(2).toString()
-             + " degrees</p><p>Wind: "+ result['list'][0]["wind"]["speed"].toString() + " m/s</><p>Query time: " + start
-             + "</p><p>" + "Response time: " + responseTime + " seconds</p>");
-
-        responses.push(responseTime)
-    });
+    function format_time(num) {
+        var zero = "0";
+        if (num < 10) {
+            return zero.concat(num.toString());
+        } else {
+            return num.toString();
+        }
+    };
 
     setInterval(function() {
         $.getJSON("/profiles", function(result){
-            document.getElementById("num_users").innerHTML = "<br><p style=\"color: #5743AF\">Number of users currently: " + result['num_profiles'] + "</p>";
+
+            document.getElementById("num_users").innerHTML =
+            "<br><p style=\"color: white\">User Count:<h1 style=\"color: white\">"
+             + result['num_profiles'] + "</h1></p>";
+
+            if (time == null) {
+                time = new Date();
+                document.getElementById("user_stats").innerHTML =
+                "<p style=\"color: white\"><i class=\"fa fa-history\"></i> No change in user count since "
+                + time.getHours() +  ":" + format_time(time.getMinutes()) + "</p>";
+            }
+            else if (result['num_profiles'] != user_count) {
+                user_count = result['num_profiles'];
+                time = new Date();
+                document.getElementById("user_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
+                + " No change in user count since "+ time.getHours() + ":" + format_time(time.getMinutes()) + "</p>";
+            }
+            else {
+                document.getElementById("user_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
+                + " No change in user count since "+ time.getHours() + ":" + format_time(time.getMinutes()) + "</p>";
+            }
         });
-    }, 1000);
+    }, 10000);
+
+
+
+
     $sidebar = $('.sidebar');
     $sidebar_img_container = $sidebar.find('.sidebar-background');
 
@@ -143,7 +163,18 @@ $().ready(function() {
 
 type = ['primary', 'info', 'success', 'warning', 'danger'];
 
+
 demo = {
+
+//https://stackoverflow.com/questions/9058801/flip-div-with-two-sides-of-html
+//https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_flip_card
+
+    initDivFlip: function() {
+        setInterval(function() {
+            $('#f1_card').toggleClass("transformStyle transformRotate");
+        }, 3000)
+    },
+
     initPickColor: function() {
         $('.pick-class-label').click(function() {
             var new_class = $(this).attr('new-class');

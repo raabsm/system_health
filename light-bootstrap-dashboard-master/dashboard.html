@@ -1,4 +1,4 @@
-<!-- 
+<!--
 =========================================================
  Light Bootstrap Dashboard - v2.0.1
 =========================================================
@@ -27,13 +27,27 @@
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,200" rel="stylesheet" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
     <!-- CSS Files -->
-    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="assets/css/light-bootstrap-dashboard.css?v=2.0.0 " rel="stylesheet" />
-<!--    &lt;!&ndash; CSS Just for demo purpose, don't include it in your project &ndash;&gt;-->
-<!--    <link href="assets/css/demo.css" rel="stylesheet" />-->
+    <link href="/assets/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- got rid of this string after the link ?v=2.0.0 -->
+    <link href="/assets/css/light-bootstrap-dashboard.css" rel="stylesheet" />
+    <!-- CSS Just for demo purpose, don't include it in your project -->
+    <link href="/assets/css/demo.css" rel="stylesheet" />
 </head>
 
 <body>
+
+    <div id="f1_container">
+    <div id="f1_card" class="shadow">
+      <div class="front face">
+        <img src="http://css3.bradshawenterprises.com/images/Windows%20Logo.jpg"/>
+      </div>
+      <div class="back face center">
+        <p>This is nice for exposing more information about an image.</p>
+        <p>Any content can go here.</p>
+      </div>
+    </div>
+    </div><br><br><br><br>
+
     <div class="content">
         <div class="container-fluid">
             <div class = "row">
@@ -41,6 +55,7 @@
                     <div class="card ">
                         <div class="card-body" style="background-color: #5743AF">
                             <div class="widget" id="num_users" ></div>
+                            <div id="user_stats"></div>
                         </div>
                     </div>
                 </div>
@@ -332,8 +347,9 @@
     $(document).ready(function() {
         // Javascript method's body can be found in assets/js/demos.js
         demo.initDashboardPageCharts();
-
+        demo.initDivFlip();
     });
+
 </script>
 
 </html>
