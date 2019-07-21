@@ -32,6 +32,16 @@ def get_number_profiles():
     return response[0][0]
 
 
+def get_number_policies():
+    query = 'SELECT COUNT(id) FROM "Insurance"."insurance_policies"'
+    response = DBConnection.get_all_responses(query)
+    return response[0][0]
+
+def get_revenue():
+    query = 'SELECT COUNT(id) FROM "Insurance"."insurance_policies"'
+    response = DBConnection.get_all_responses(query)
+    return response[0][0]
+
 # render the page; let jQuery do the work
 class jsHandler(tornado.web.RequestHandler):
     def get(self):
@@ -47,11 +57,22 @@ class ProfilesHandler(tornado.web.RequestHandler):
         self.write({'num_profiles': get_number_profiles()})
 
 
+class PoliciesHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.write({'num_policies': get_number_policies()})
+
+class RevenueHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.write({'num_revenue': get_revenue()})
+
+
 # launch url according to input path
 def application():
     try:
         urls = [(r"/", jsHandler),
                 (r"/profiles", ProfilesHandler),
+                (r"/policies", PoliciesHandler),
+                (r"/revenue", RevenueHandler),
                 (r"/assets/css/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/css"},),
                 (r"/assets/js/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/js"},),
                 (r"/assets/js/core/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/js/core"},),

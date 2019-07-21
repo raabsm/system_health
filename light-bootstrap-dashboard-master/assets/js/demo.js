@@ -38,6 +38,33 @@ $().ready(function() {
         });
     }, 10000);
 
+    setInterval(function() {
+        $.getJSON("/policies", function(result){
+
+            document.getElementById("num_policies").innerHTML =
+            "<br><p style=\"color: white\">Policy Count:<h1 style=\"color: white\">"
+             + result['num_policies'] + "</h1></p>";
+
+            if (time == null) {
+                time = new Date();
+                document.getElementById("policies_stats").innerHTML =
+                "<p style=\"color: white\"><i class=\"fa fa-history\"></i> No change in user count since "
+                + time.getHours() +  ":" + format_time(time.getMinutes()) + "</p>";
+            }
+            else if (result['num_policies'] != user_count) {
+                user_count = result['num_policies'];
+                time = new Date();
+                document.getElementById("policies_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
+                + " No change in policy count since "+ time.getHours() + ":" + format_time(time.getMinutes()) + "</p>";
+            }
+            else {
+                document.getElementById("policies_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
+                + " No change in policy count since "+ time.getHours() + ":" + format_time(time.getMinutes()) + "</p>";
+            }
+        });
+    }, 10000);
+
+
 
 
 
