@@ -5,13 +5,10 @@ import tornado.options
 import datetime
 import requests
 import json
-import logging
-from pymongo import MongoClient
+import DBConnection
 
 
 tornado.options.define('port', default=8888, help='port to listen on')
-
-# Create a logging instance // https://do
 
 
 # return an object containing info for each widget
@@ -29,26 +26,10 @@ def widget_properties(name, url):
         print("Couldn't get widget properties")
 
 
-# def DBconnection():
-#     prod_connection_string = "dbname='skywatch_prod' user='skywatch@skywatchdb-prod.postgres.database.azure.com' " \
-#                              "host='skywatchdb-prod.postgres.database.azure.com' password='SkyWatch1234'"
-#
-#     conn = psycopg2.connect(
-#         prod_connection_string,
-#         sslmode='require')
-#     cursor = conn.cursor()
-
-# call required function based on input name
-# def widget_specs(name, r, stamp, response_time):
-#     if name == "widget1":
-#         topost.insert_one({"widget1": {"stamp": stamp, "responsetime": response_time}})
-#         return weather_widget(r)
-#     elif name == "catfacts":
-#         topost.insert_one({"catfacts": {"stamp": stamp, "responsetime": response_time}})
-#         return cat_facts(r)
-#     elif name == "quote":
-#         topost.insert_one({"quote": {"stamp": stamp, "responsetime": response_time}})
-#         return quote(r)
+def get_number_profiles():
+    query = 'SELECT COUNT(id) FROM "User"."profiles"'
+    response = DBConnection.get_all_responses(query)
+    return response[0][0]
 
 
 # render the page; let jQuery do the work
@@ -61,15 +42,16 @@ class jsHandler(tornado.web.RequestHandler):
 
 
 # renders the JSON file at the url on a local page
-class revenueHandler(tornado.web.RequestHandler):
+class ProfilesHandler(tornado.web.RequestHandler):
     def get(self):
-        """ TO DO """
+        self.write({'num_profiles': get_number_profiles()})
 
 
 # launch url according to input path
 def application():
     try:
         urls = [(r"/", jsHandler),
+                (r"/profiles", ProfilesHandler),
                 (r"/assets/css/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/css"},),
                 (r"/assets/js/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/js"},),
                 (r"/assets/js/core/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/js/core"},),

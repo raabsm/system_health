@@ -29,8 +29,8 @@
     <!-- CSS Files -->
     <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
     <link href="assets/css/light-bootstrap-dashboard.css?v=2.0.0 " rel="stylesheet" />
-    <!-- CSS Just for demo purpose, don't include it in your project -->
-    <link href="assets/css/demo.css" rel="stylesheet" />
+<!--    &lt;!&ndash; CSS Just for demo purpose, don't include it in your project &ndash;&gt;-->
+<!--    <link href="assets/css/demo.css" rel="stylesheet" />-->
 </head>
 
 <body>
@@ -39,8 +39,8 @@
             <div class = "row">
                 <div class="col-md-4">
                     <div class="card ">
-                        <div class="card-body">
-                            <div class="widget" id="weather"></div><br><br><br><br><br><br><br><br><br>
+                        <div class="card-body" style="background-color: #5743AF">
+                            <div class="widget" id="num_users" ></div>
                         </div>
                     </div>
                 </div>
@@ -329,12 +329,9 @@
 <!-- Light Bootstrap Dashboard DEMO methods, don't include it in your project! -->
 <script src="assets/js/demo.js"></script>
 <script type="text/javascript">
-
     $(document).ready(function() {
         // Javascript method's body can be found in assets/js/demos.js
         demo.initDashboardPageCharts();
-
-        demo.showNotification();
 
     });
 </script>
