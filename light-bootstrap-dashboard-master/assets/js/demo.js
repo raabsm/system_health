@@ -18,7 +18,7 @@ $().ready(function() {
 
     setInterval(function() {
         $.getJSON("/profiles", function(result){
-            document.getElementById("num_users").innerHTML = "<br><p>Number of users currently: " + result['num_profiles'] + "</p>";
+            document.getElementById("num_users").innerHTML = "<br><p style=\"color: #5743AF\">Number of users currently: " + result['num_profiles'] + "</p>";
         });
     }, 1000);
     $sidebar = $('.sidebar');
