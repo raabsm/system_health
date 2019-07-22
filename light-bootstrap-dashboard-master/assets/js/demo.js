@@ -4,17 +4,16 @@ $().ready(function() {
     var policy_count;
     var revenue_today;
     var total_revenue;
-    var policy_time = null;
-    var revenue_time = null;
 
-    function format_time(num) {
-        var zero = "0";
-        if (num < 10) {
-            return zero.concat(num.toString());
-        } else {
-            return num.toString();
-        }
-    };
+//    function format_time(num) {
+//        var zero = "0";
+//        if (num < 10) {
+//            return zero.concat(num.toString());
+//        } else {
+//            return num.toString();
+//        }
+//    };
+
 
     function profiles() {
         $.getJSON("/profiles", function(result){
@@ -43,23 +42,6 @@ $().ready(function() {
             document.getElementById("num_policies").innerHTML =
             "<br><p style=\"color: white\">Policy Count:<h1 style=\"color: white\">"
              + result['total_policies'] + "</h1></p>";
-
-//            if (policy_time == null) {
-//                policy_time = new Date();
-//                document.getElementById("policies_stats").innerHTML =
-//                "<p style=\"color: white\"><i class=\"fa fa-history\"></i> No change in user count since "
-//                + policy_time.getHours() +  ":" + format_time(policy_time.getMinutes()) + "</p>";
-//            }
-//            else if (result['total_policies'] != policy_count) {
-//                policy_count = result['total_policies'];
-//                policy_time = new Date();
-//                document.getElementById("policies_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
-//                + " No change in policy count since "+ policy_time.getHours() + ":" + format_time(policy_time.getMinutes()) + "</p>";
-//            }
-//            else {
-//                document.getElementById("policies_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
-//                + " No change in policy count since "+ policy_time.getHours() + ":" + format_time(policy_time.getMinutes()) + "</p>";
-//            }
         });
     };
 
@@ -70,24 +52,6 @@ $().ready(function() {
             "<br><p style=\"color: white\">Total Revenue:<h1 style=\"color: white\">"
              + result['total_revenue'] + "</h1></p><p style=\"color: white\">Revenue today:"
              + "<h2 style=\"color: white\">" + result['revenue_today'] + "</h2></p>";
-
-//            if (revenue_time == null) {
-//                revenue_time = new Date();
-//                document.getElementById("revenue_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
-//                + " Revenue increased at " + revenue_time.getHours() +  ":"
-//                + format_time(revenue_time.getMinutes()) + "</p>";
-//            }
-//            else if (result['total_revenue'] != total_revenue) {
-//                total_revenue = result['total_revenue'];
-//                revenue_today = result['revenue_today'];
-//                revenue_time = new Date();
-//                document.getElementById("revenue_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
-//                + " Revenue increased at "+ revenue_time.getHours() + ":" + format_time(revenue_time.getMinutes()) + "</p>";
-//            }
-//            else {
-//                document.getElementById("revenue_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
-//                + " Revenue increased at "+ revenue_time.getHours() + ":" + format_time(revenue_time.getMinutes()) + "</p>";
-//            }
         });
     };
 
@@ -105,9 +69,46 @@ $().ready(function() {
         $('#f1_card').toggleClass("transformStyle transformRotate");
     }, 3000);
 
+//=====================================================================================================================//
 
+    //api pings
+    function ping() {
+        var apis = [{name: "Skywatch",
+                        info: {active: false,
+                                response_time: 1.002}
+                     },
+                     {name: "Database",
+                        info: {active: true,
+                                response_time: 0.102}
+                     },
+                     {name: "Airmap",
+                        info: {active: false,
+                                response_time: 0.034}
+                     }]
+        var i;
+        var result = "";
+        for (i = 0; i < apis.length; i++) {
 
+            if (apis[i]['info']['active']) {
+                var sign = "<i class=\"fa fa-circle text-info\"></i>";
+            }
+            else {
+                var sign = "<i class=\"fa fa-circle text-danger\"></i>";
+            }
 
+            var response_time = apis[i]['info']['response_time'].toString();
+
+            result = result + "<div class=\"col-md-2\"> <div class=\"card \"> <div class=\"card-body\">" +
+             "<div class=\"widget\" id=\"api\"><h3>" + apis[i]['name'] + "</h3><p>Response time: "+ response_time + " seconds</p>" + sign +
+             "</div></div></div></div>";
+        }
+        document.getElementById("ping").innerHTML = result;
+    }
+
+    ping();
+    setInterval(function() {
+        ping();
+    }, 1000);
 
     $sidebar = $('.sidebar');
     $sidebar_img_container = $sidebar.find('.sidebar-background');
@@ -366,15 +367,14 @@ demo = {
         // lbd.startAnimationForLineChart(chartHours);
 
         var data = {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-            series: [
-                [542, 443, 320, 780, 553, 453, 326, 434, 568, 610, 756, 895],
-                [412, 243, 280, 580, 453, 353, 300, 364, 368, 410, 636, 695]
-            ]
+            labels: ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'],
+            series: $.getJSON("/profiles", function(result){
+                    //get valid list of data and return it
+                }
         };
 
         var options = {
-            seriesBarDistance: 10,
+            seriesBarDistance: 5,
             axisX: {
                 showGrid: false
             },

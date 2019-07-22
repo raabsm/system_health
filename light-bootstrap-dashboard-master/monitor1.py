@@ -183,8 +183,11 @@ def application():
 
 
 if __name__ == "__main__":
-    app = application()
-    http_server = tornado.httpserver.HTTPServer(app)
-    http_server.listen(tornado.options.options.port)
-    print("Success; listening on http://localhost:%i" % tornado.options.options.port)
-    tornado.ioloop.IOLoop.current().start()
+    try:
+        app = application()
+        http_server = tornado.httpserver.HTTPServer(app)
+        http_server.listen(tornado.options.options.port)
+        print("Success; listening on http://localhost:%i" % tornado.options.options.port)
+        tornado.ioloop.IOLoop.current().start()
+    except Exception as e:
+        print(e)
