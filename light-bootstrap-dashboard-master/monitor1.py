@@ -50,7 +50,7 @@ class ProfilesHandler(tornado.web.RequestHandler):
         profiles_last_week_query = total_profiles_query \
                              + ' WHERE date_added > \'{0}\''.format(last_week.strftime("%Y-%m-%d"))
         data = {'total_profiles': query_database(total_profiles_query),
-                'most_recently_added': query_database(last_profile_added).strftime("%H-%M-%S"),
+                'most_recently_added': query_database(last_profile_added).strftime("%H:%M"),
                 'total_last_week': query_database(profiles_last_week_query)}
         self.write(data)
 

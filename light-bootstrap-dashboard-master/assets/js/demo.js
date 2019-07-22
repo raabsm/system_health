@@ -4,7 +4,6 @@ $().ready(function() {
     var policy_count;
     var revenue_today;
     var total_revenue;
-    var user_time = null;
     var policy_time = null;
     var revenue_time = null;
 
@@ -21,24 +20,19 @@ $().ready(function() {
         $.getJSON("/profiles", function(result){
 
             document.getElementById("num_users").innerHTML =
-            "<br><p style=\"color: white\">User Count:<h1 style=\"color: white\">"
-             + result['num_profiles'] + "</h1></p>";
+            "<br><p style=\"color: white\">Total User Count:<h1 style=\"color: white\">"
+             + result['total_profiles'] + "</h1></p><p style=\"color: white\">Joined in last week:"
+             + "<h2 style=\"color: white\">" + result['total_last_week'] + "</h2></p>";
 
-            if (user_time == null) {
-                user_time = new Date();
-                document.getElementById("user_stats").innerHTML =
-                "<p style=\"color: white\"><i class=\"fa fa-history\"></i> No change in user count since "
-                + user_time.getHours() +  ":" + format_time(user_time.getMinutes()) + "</p>";
-            }
-            else if (result['num_profiles'] != user_count) {
-                user_count = result['num_profiles'];
-                user_time = new Date();
+
+            if (result['num_profiles'] != user_count) {
+                user_count = result['total_profiles'];
                 document.getElementById("user_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
-                + " No change in user count since "+ user_time.getHours() + ":" + format_time(user_time.getMinutes()) + "</p>";
+                + " No change in user count since "+ result['most_recently_added'] + "</p>";
             }
             else {
                 document.getElementById("user_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
-                + " No change in user count since "+ user_time.getHours() + ":" + format_time(user_time.getMinutes()) + "</p>";
+                + " No change in user count since "+ result['most_recently_added'] + "</p>";
             }
         });
     };
@@ -48,26 +42,26 @@ $().ready(function() {
 
             document.getElementById("num_policies").innerHTML =
             "<br><p style=\"color: white\">Policy Count:<h1 style=\"color: white\">"
-             + result['num_policies'] + "</h1></p>";
+             + result['total_policies'] + "</h1></p>";
 
-            if (policy_time == null) {
-                policy_time = new Date();
-                document.getElementById("policies_stats").innerHTML =
-                "<p style=\"color: white\"><i class=\"fa fa-history\"></i> No change in user count since "
-                + policy_time.getHours() +  ":" + format_time(policy_time.getMinutes()) + "</p>";
-            }
-            else if (result['num_policies'] != policy_count) {
-                policy_count = result['num_policies'];
-                policy_time = new Date();
-                document.getElementById("policies_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
-                + " No change in policy count since "+ policy_time.getHours() + ":" + format_time(policy_time.getMinutes()) + "</p>";
-            }
-            else {
-                document.getElementById("policies_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
-                + " No change in policy count since "+ policy_time.getHours() + ":" + format_time(policy_time.getMinutes()) + "</p>";
-            }
+//            if (policy_time == null) {
+//                policy_time = new Date();
+//                document.getElementById("policies_stats").innerHTML =
+//                "<p style=\"color: white\"><i class=\"fa fa-history\"></i> No change in user count since "
+//                + policy_time.getHours() +  ":" + format_time(policy_time.getMinutes()) + "</p>";
+//            }
+//            else if (result['total_policies'] != policy_count) {
+//                policy_count = result['total_policies'];
+//                policy_time = new Date();
+//                document.getElementById("policies_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
+//                + " No change in policy count since "+ policy_time.getHours() + ":" + format_time(policy_time.getMinutes()) + "</p>";
+//            }
+//            else {
+//                document.getElementById("policies_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
+//                + " No change in policy count since "+ policy_time.getHours() + ":" + format_time(policy_time.getMinutes()) + "</p>";
+//            }
         });
-    }
+    };
 
     function revenue() {
         $.getJSON("/revenue", function(result){
@@ -75,25 +69,25 @@ $().ready(function() {
             document.getElementById("revenue").innerHTML =
             "<br><p style=\"color: white\">Total Revenue:<h1 style=\"color: white\">"
              + result['total_revenue'] + "</h1></p><p style=\"color: white\">Revenue today:"
-             + "<h2 style=\"color: white\">" + result['revenue_today'] + "</h1></p>";
+             + "<h2 style=\"color: white\">" + result['revenue_today'] + "</h2></p>";
 
-            if (revenue_time == null) {
-                revenue_time = new Date();
-                document.getElementById("revenue_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
-                + " Revenue increased at " + revenue_time.getHours() +  ":"
-                + format_time(revenue_time.getMinutes()) + "</p>";
-            }
-            else if (result['total_revenue'] != total_revenue) {
-                total_revenue = result['total_revenue'];
-                revenue_today = result['revenue_today'];
-                revenue_time = new Date();
-                document.getElementById("revenue_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
-                + " Revenue increased at "+ revenue_time.getHours() + ":" + format_time(revenue_time.getMinutes()) + "</p>";
-            }
-            else {
-                document.getElementById("revenue_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
-                + " Revenue increased at "+ revenue_time.getHours() + ":" + format_time(revenue_time.getMinutes()) + "</p>";
-            }
+//            if (revenue_time == null) {
+//                revenue_time = new Date();
+//                document.getElementById("revenue_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
+//                + " Revenue increased at " + revenue_time.getHours() +  ":"
+//                + format_time(revenue_time.getMinutes()) + "</p>";
+//            }
+//            else if (result['total_revenue'] != total_revenue) {
+//                total_revenue = result['total_revenue'];
+//                revenue_today = result['revenue_today'];
+//                revenue_time = new Date();
+//                document.getElementById("revenue_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
+//                + " Revenue increased at "+ revenue_time.getHours() + ":" + format_time(revenue_time.getMinutes()) + "</p>";
+//            }
+//            else {
+//                document.getElementById("revenue_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
+//                + " Revenue increased at "+ revenue_time.getHours() + ":" + format_time(revenue_time.getMinutes()) + "</p>";
+//            }
         });
     };
 
@@ -314,11 +308,9 @@ demo = {
 
 
         var dataSales = {
-            labels: ['9:00AM', '12:00AM', '3:00PM', '6:00PM', '9:00PM', '12:00PM', '3:00AM', '6:00AM'],
+            labels: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
             series: [
-                [287, 385, 490, 492, 554, 586, 698, 695, 752, 788, 846, 944],
-                [67, 152, 143, 240, 287, 335, 435, 437, 539, 542, 544, 647],
-                [23, 113, 67, 108, 190, 239, 307, 308, 439, 410, 410, 509]
+                [500, 385, 490, 492, 554, 586, 698, 695, 752, 788, 846, 944]
             ]
         };
 
