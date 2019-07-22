@@ -43,8 +43,8 @@ def add_api_data(dictionary, api_name, response):
         active = True
     response_time = str(response.elapsed.total_seconds())
     print(type(response.elapsed))
-    dictionary.update({api_name: {'active': active,
-                                 'response_time': response_time}})
+    dictionary['api'].append({api_name: {'active': active,
+                             'response_time': response_time}})
     return dictionary
 
 
@@ -94,12 +94,13 @@ class RevenueHandler(tornado.web.RequestHandler):
 
 class ApiHandler(tornado.web.RequestHandler):
     def get(self):
-        data = {}
+        data = {'api':[]}
         hazard_response = self.query_hazard_service(40.791859, -84.434, 30, 'http://hazards.skywatch.ai')
         skywatch_response = self.query_skywatch_api()
-        data = add_api_data(data, 'hazard_api', hazard_response)
-        data = add_api_data(data, 'skywatch_api', skywatch_response)
-        data = self.test_database(data)
+        add_api_data(data, 'hazard_api', hazard_response)
+        add_api_data(data, 'skywatch_api', skywatch_response)
+        self.test_database(data)
+        print(data)
         self.write(data)
 
     def query_hazard_service(self, lat, lng, radius, url):
@@ -120,7 +121,7 @@ class ApiHandler(tornado.web.RequestHandler):
         else:
             active = False
             response_time = 0
-        dictionary.update({'DataBase': {'active': active,
+        dictionary['api'].append({'DataBase': {'active': active,
                                   'response_time': str(response_time)}})
         return dictionary
 
