@@ -101,11 +101,9 @@ function ping() {
 }
 
 ping();
-
-
-
-
-
+setInterval(function() {
+    ping();
+}, 60000);
 
     $sidebar = $('.sidebar');
     $sidebar_img_container = $sidebar.find('.sidebar-background');
@@ -364,15 +362,14 @@ demo = {
         // lbd.startAnimationForLineChart(chartHours);
 
         var data = {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            labels: ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'],
             series: [
-                [542, 443, 320, 780, 553, 453, 326, 434, 568, 610, 756, 895],
-                [412, 243, 280, 580, 453, 353, 300, 364, 368, 410, 636, 695]
+                [542, 443, 320, 780, 553, 453, 326]
             ]
         };
 
         var options = {
-            seriesBarDistance: 10,
+            seriesBarDistance: 5,
             axisX: {
                 showGrid: false
             },
