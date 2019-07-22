@@ -17,7 +17,7 @@ $().ready(function() {
         }
     };
 
-    setInterval(function() {
+    function profiles() {
         $.getJSON("/profiles", function(result){
 
             document.getElementById("num_users").innerHTML =
@@ -41,9 +41,9 @@ $().ready(function() {
                 + " No change in user count since "+ user_time.getHours() + ":" + format_time(user_time.getMinutes()) + "</p>";
             }
         });
-    }, 1000);
+    };
 
-    setInterval(function() {
+    function policies() {
         $.getJSON("/policies", function(result){
 
             document.getElementById("num_policies").innerHTML =
@@ -67,15 +67,15 @@ $().ready(function() {
                 + " No change in policy count since "+ policy_time.getHours() + ":" + format_time(policy_time.getMinutes()) + "</p>";
             }
         });
-    }, 1000);
+    }
 
-    setInterval(function() {
+    function revenue() {
         $.getJSON("/revenue", function(result){
 
             document.getElementById("revenue").innerHTML =
             "<br><p style=\"color: white\">Total Revenue:<h1 style=\"color: white\">"
-             + result['total_revenue'] + "</h1></p><p style=\"color: white\">Revenue over last"
-             + " 24h:<h2 style=\"color: white\">" + result['revenue_today'] + "</h1></p>";
+             + result['total_revenue'] + "</h1></p><p style=\"color: white\">Revenue today:"
+             + "<h2 style=\"color: white\">" + result['revenue_today'] + "</h1></p>";
 
             if (revenue_time == null) {
                 revenue_time = new Date();
@@ -95,7 +95,17 @@ $().ready(function() {
                 + " Revenue increased at "+ revenue_time.getHours() + ":" + format_time(revenue_time.getMinutes()) + "</p>";
             }
         });
+    };
+
+    setInterval( function() {
+        profiles();
+        policies();
+        revenue();
     }, 1000);
+
+    setInterval(function() {
+        $('#f1_card').toggleClass("transformStyle transformRotate");
+    }, 3000);
 
 
 
@@ -228,12 +238,6 @@ demo = {
 
 //https://stackoverflow.com/questions/9058801/flip-div-with-two-sides-of-html
 //https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_flip_card
-
-    initDivFlip: function() {
-        setInterval(function() {
-            $('#f1_card').toggleClass("transformStyle transformRotate");
-        }, 3000)
-    },
 
     initPickColor: function() {
         $('.pick-class-label').click(function() {
