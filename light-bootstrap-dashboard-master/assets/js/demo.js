@@ -74,13 +74,14 @@ $().ready(function() {
 
             document.getElementById("revenue").innerHTML =
             "<br><p style=\"color: white\">Total Revenue:<h1 style=\"color: white\">"
-             + result['total_revenue'] + "</h1></p><p>Revenue over last 24h:<h2 style=\"color: white\">" +
-             result['revenue_today'] + "</h1></p>";
+             + result['total_revenue'] + "</h1></p><p style=\"color: white\">Revenue over last"
+             + " 24h:<h2 style=\"color: white\">" + result['revenue_today'] + "</h1></p>";
 
             if (revenue_time == null) {
                 revenue_time = new Date();
-                document.getElementById("revenue_stats").innerHTML =
-                + revenue_time.getHours() +  ":" + format_time(revenue_time.getMinutes()) + "</p>";
+                document.getElementById("revenue_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
+                + " Revenue increased at " + revenue_time.getHours() +  ":"
+                + format_time(revenue_time.getMinutes()) + "</p>";
             }
             else if (result['total_revenue'] != total_revenue) {
                 total_revenue = result['total_revenue'];
