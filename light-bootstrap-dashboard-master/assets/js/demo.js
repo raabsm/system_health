@@ -97,11 +97,15 @@ $().ready(function() {
         });
     };
 
+    profiles();
+    policies();
+    revenue();
+
     setInterval( function() {
         profiles();
         policies();
         revenue();
-    }, 1000);
+    }, 5000);
 
     setInterval(function() {
         $('#f1_card').toggleClass("transformStyle transformRotate");
