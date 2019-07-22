@@ -1,7 +1,12 @@
 $().ready(function() {
 
-    var user_count = 0;
-    var time = null;
+    var user_count;
+    var policy_count;
+    var revenue_today;
+    var total_revenue;
+    var user_time = null;
+    var policy_time = null;
+    var revenue_time = null;
 
     function format_time(num) {
         var zero = "0";
@@ -19,21 +24,21 @@ $().ready(function() {
             "<br><p style=\"color: white\">User Count:<h1 style=\"color: white\">"
              + result['num_profiles'] + "</h1></p>";
 
-            if (time == null) {
-                time = new Date();
+            if (user_time == null) {
+                user_time = new Date();
                 document.getElementById("user_stats").innerHTML =
                 "<p style=\"color: white\"><i class=\"fa fa-history\"></i> No change in user count since "
-                + time.getHours() +  ":" + format_time(time.getMinutes()) + "</p>";
+                + user_time.getHours() +  ":" + format_time(user_time.getMinutes()) + "</p>";
             }
             else if (result['num_profiles'] != user_count) {
                 user_count = result['num_profiles'];
-                time = new Date();
+                user_time = new Date();
                 document.getElementById("user_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
-                + " No change in user count since "+ time.getHours() + ":" + format_time(time.getMinutes()) + "</p>";
+                + " No change in user count since "+ user_time.getHours() + ":" + format_time(user_time.getMinutes()) + "</p>";
             }
             else {
                 document.getElementById("user_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
-                + " No change in user count since "+ time.getHours() + ":" + format_time(time.getMinutes()) + "</p>";
+                + " No change in user count since "+ user_time.getHours() + ":" + format_time(user_time.getMinutes()) + "</p>";
             }
         });
     }, 1000);
@@ -45,21 +50,21 @@ $().ready(function() {
             "<br><p style=\"color: white\">Policy Count:<h1 style=\"color: white\">"
              + result['num_policies'] + "</h1></p>";
 
-            if (time == null) {
-                time = new Date();
+            if (policy_time == null) {
+                policy_time = new Date();
                 document.getElementById("policies_stats").innerHTML =
                 "<p style=\"color: white\"><i class=\"fa fa-history\"></i> No change in user count since "
-                + time.getHours() +  ":" + format_time(time.getMinutes()) + "</p>";
+                + policy_time.getHours() +  ":" + format_time(policy_time.getMinutes()) + "</p>";
             }
-            else if (result['num_policies'] != user_count) {
-                user_count = result['num_policies'];
-                time = new Date();
+            else if (result['num_policies'] != policy_count) {
+                policy_count = result['num_policies'];
+                policy_time = new Date();
                 document.getElementById("policies_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
-                + " No change in policy count since "+ time.getHours() + ":" + format_time(time.getMinutes()) + "</p>";
+                + " No change in policy count since "+ policy_time.getHours() + ":" + format_time(policy_time.getMinutes()) + "</p>";
             }
             else {
                 document.getElementById("policies_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
-                + " No change in policy count since "+ time.getHours() + ":" + format_time(time.getMinutes()) + "</p>";
+                + " No change in policy count since "+ policy_time.getHours() + ":" + format_time(policy_time.getMinutes()) + "</p>";
             }
         });
     }, 1000);
@@ -67,25 +72,27 @@ $().ready(function() {
     setInterval(function() {
         $.getJSON("/revenue", function(result){
 
-            document.getElementById("num_revenue").innerHTML =
-            "<br><p style=\"color: white\">Policy Count:<h1 style=\"color: white\">"
-             + result['num_revenue'] + "</h1></p>";
+            document.getElementById("revenue").innerHTML =
+            "<br><p style=\"color: white\">Total Revenue:<h1 style=\"color: white\">"
+             + result['total_revenue'] + "</h1></p><p style=\"color: white\">Revenue over last"
+             + " 24h:<h2 style=\"color: white\">" + result['revenue_today'] + "</h1></p>";
 
-            if (time == null) {
-                time = new Date();
-                document.getElementById("revenue_stats").innerHTML =
-                "<p style=\"color: white\"><i class=\"fa fa-history\"></i> No change in user count since "
-                + time.getHours() +  ":" + format_time(time.getMinutes()) + "</p>";
-            }
-            else if (result['num_revenue'] != user_count) {
-                user_count = result['num_revenue'];
-                time = new Date();
+            if (revenue_time == null) {
+                revenue_time = new Date();
                 document.getElementById("revenue_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
-                + " No change in policy count since "+ time.getHours() + ":" + format_time(time.getMinutes()) + "</p>";
+                + " Revenue increased at " + revenue_time.getHours() +  ":"
+                + format_time(revenue_time.getMinutes()) + "</p>";
+            }
+            else if (result['total_revenue'] != total_revenue) {
+                total_revenue = result['total_revenue'];
+                revenue_today = result['revenue_today'];
+                revenue_time = new Date();
+                document.getElementById("revenue_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
+                + " Revenue increased at "+ revenue_time.getHours() + ":" + format_time(revenue_time.getMinutes()) + "</p>";
             }
             else {
                 document.getElementById("revenue_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
-                + " No change in policy count since "+ time.getHours() + ":" + format_time(time.getMinutes()) + "</p>";
+                + " Revenue increased at "+ revenue_time.getHours() + ":" + format_time(revenue_time.getMinutes()) + "</p>";
             }
         });
     }, 1000);
