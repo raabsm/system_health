@@ -71,39 +71,44 @@ $().ready(function() {
 
 //=====================================================================================================================//
 
-//api pings
-function ping() {
-    var apis = [{name: "Skywatch",
-                    info: {active: false,
-                            response_time: 1.002}
-                 },
-                 {name: "Database",
-                    info: {active: true,
-                            response_time: 0.102}
-                 },
-                 {name: "Airmap",
-                    info: {active: false,
-                            response_time: 0.034}
-                 }]
-    var i;
-    for (i = 0; i < apis.length; i++) {
-        if (apis[i]['info']['active']) {
-            var sign = "<i class=\"fa fa-circle text-info\"></i>";
-        }
-        else {
-            var sign = "<i class=\"fa fa-circle text-danger\"></i>";
-        }
-        var response_time = apis[i]['info']['response_time'].toString()
-        $("#ping").append("<div class=\"col-md-2\"> <div class=\"card \"> <div class=\"card-body\">" +
-         "<div class=\"widget\" id=\"api\"><h3>" + apis[i]['name'] + "</h3><p>Response time: "+ response_time + " seconds</p>" + sign +
-         "</div></div></div></div>");
-    }
-}
+    //api pings
+    function ping() {
+        var apis = [{name: "Skywatch",
+                        info: {active: false,
+                                response_time: 1.002}
+                     },
+                     {name: "Database",
+                        info: {active: true,
+                                response_time: 0.102}
+                     },
+                     {name: "Airmap",
+                        info: {active: false,
+                                response_time: 0.034}
+                     }]
+        var i;
+        var result = "";
+        for (i = 0; i < apis.length; i++) {
 
-ping();
-setInterval(function() {
+            if (apis[i]['info']['active']) {
+                var sign = "<i class=\"fa fa-circle text-info\"></i>";
+            }
+            else {
+                var sign = "<i class=\"fa fa-circle text-danger\"></i>";
+            }
+
+            var response_time = apis[i]['info']['response_time'].toString();
+
+            result = result + "<div class=\"col-md-2\"> <div class=\"card \"> <div class=\"card-body\">" +
+             "<div class=\"widget\" id=\"api\"><h3>" + apis[i]['name'] + "</h3><p>Response time: "+ response_time + " seconds</p>" + sign +
+             "</div></div></div></div>";
+        }
+        document.getElementById("ping").innerHTML = result;
+    }
+
     ping();
-}, 60000);
+    setInterval(function() {
+        ping();
+    }, 1000);
 
     $sidebar = $('.sidebar');
     $sidebar_img_container = $sidebar.find('.sidebar-background');
@@ -363,9 +368,9 @@ demo = {
 
         var data = {
             labels: ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'],
-            series: [
-                [542, 443, 320, 780, 553, 453, 326]
-            ]
+            series: $.getJSON("/profiles", function(result){
+                    //get valid list of data and return it
+                }
         };
 
         var options = {
