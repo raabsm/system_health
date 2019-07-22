@@ -26,20 +26,7 @@ def widget_properties(name, url):
         print("Couldn't get widget properties")
 
 
-def get_number_profiles():
-    query = 'SELECT COUNT(id) FROM "User"."profiles"'
-    response = DBConnection.get_all_responses(query)
-    return response[0][0]
-
-
-def get_number_policies():
-    query = 'SELECT COUNT(id) FROM "Insurance"."insurance_policies"'
-    response = DBConnection.get_all_responses(query)
-    return response[0][0]
-
-
-def get_revenue():
-    query = 'SELECT COUNT(id) FROM "Insurance"."insurance_policies"'
+def query_database(query):
     response = DBConnection.get_all_responses(query)
     return response[0][0]
 
@@ -56,17 +43,23 @@ class jsHandler(tornado.web.RequestHandler):
 # renders the JSON file at the url on a local page
 class ProfilesHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write({'num_profiles': get_number_profiles()})
+        query = 'SELECT COUNT(id) FROM "User"."profiles"'
+        self.write({'num_profiles': query_database(query)})
 
 
 class PoliciesHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write({'num_policies': get_number_policies()})
+        query = 'SELECT COUNT(id) FROM "Insurance"."insurance_policies"'
+        self.write({'num_policies': query_database(query)})
 
 
 class RevenueHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write({'num_revenue': get_revenue()})
+        total_revenue_query = 'SELECT SUM(final_price) FROM "Insurance"."insurance_purchases"'
+        today = datetime.datetime()
+        revenue_today = total_revenue_query + ' WHERE date_added > \'{}\''.format(today.strftime("%Y-%m-%d"))
+        self.write({'total_revenue': query_database(total_revenue_query),
+                    'revenue_today': query_database(revenue_today)})
 
 
 # launch url according to input path
