@@ -55,11 +55,12 @@ class PoliciesHandler(tornado.web.RequestHandler):
 
 class RevenueHandler(tornado.web.RequestHandler):
     def get(self):
+        currency = "$"
         total_revenue_query = 'SELECT SUM(final_price) FROM "Insurance"."insurance_purchases"'
-        today = datetime.datetime()
+        today = datetime.datetime.today()
         revenue_today = total_revenue_query + ' WHERE date_added > \'{}\''.format(today.strftime("%Y-%m-%d"))
-        self.write({'total_revenue': query_database(total_revenue_query),
-                    'revenue_today': query_database(revenue_today)})
+        self.write({'total_revenue': currency + str(query_database(total_revenue_query)),
+                    'revenue_today': currency + str(query_database(revenue_today))})
 
 
 # launch url according to input path
