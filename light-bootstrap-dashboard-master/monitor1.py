@@ -43,23 +43,41 @@ class jsHandler(tornado.web.RequestHandler):
 # renders the JSON file at the url on a local page
 class ProfilesHandler(tornado.web.RequestHandler):
     def get(self):
-        query = 'SELECT COUNT(id) FROM "User"."profiles"'
-        self.write({'num_profiles': query_database(query)})
+        total_profiles_query = 'SELECT COUNT(id) FROM "User"."profiles"'
+        last_profile_added = 'SELECT date_added FROM "User"."profiles" ORDER BY date_added DESC'
+        today = datetime.datetime.today()
+        last_week = (today - datetime.timedelta(days=7))
+        profiles_last_week_query = total_profiles_query \
+                             + ' WHERE date_added > \'{0}\''.format(last_week.strftime("%Y-%m-%d"))
+        data = {'total_profiles': query_database(total_profiles_query),
+                'most_recently_added': query_database(last_profile_added).strftime("%H-%M-%S"),
+                'total_last_week': query_database(profiles_last_week_query)}
+        self.write(data)
 
 
 class PoliciesHandler(tornado.web.RequestHandler):
     def get(self):
-        query = 'SELECT COUNT(id) FROM "Insurance"."insurance_policies"'
-        self.write({'num_policies': query_database(query)})
+        total_policies_query = 'SELECT COUNT(id) FROM "Insurance"."insurance_policies"'
+        self.write({'total_policies': query_database(total_policies_query)})
 
 
 class RevenueHandler(tornado.web.RequestHandler):
     def get(self):
         total_revenue_query = 'SELECT SUM(final_price) FROM "Insurance"."insurance_purchases"'
-        today = datetime.datetime()
+        today = datetime.datetime.today()
         revenue_today = total_revenue_query + ' WHERE date_added > \'{}\''.format(today.strftime("%Y-%m-%d"))
         self.write({'total_revenue': query_database(total_revenue_query),
                     'revenue_today': query_database(revenue_today)})
+
+
+class ApiHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.post()
+
+    def post(self):
+        skywatch_api = 'https://api.skywatch.ai/api/insurances/offers'
+        response = requests.get(skywatch_api)
+        print(response)
 
 
 # launch url according to input path
@@ -69,6 +87,7 @@ def application():
                 (r"/profiles", ProfilesHandler),
                 (r"/policies", PoliciesHandler),
                 (r"/revenue", RevenueHandler),
+                (r"/api", ApiHandler),
                 (r"/assets/css/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/css"},),
                 (r"/assets/js/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/js"},),
                 (r"/assets/js/core/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/js/core"},),
