@@ -36,7 +36,7 @@ $().ready(function() {
                 + " No change in user count since "+ time.getHours() + ":" + format_time(time.getMinutes()) + "</p>";
             }
         });
-    }, 10000);
+    }, 1000);
 
     setInterval(function() {
         $.getJSON("/policies", function(result){
@@ -62,7 +62,33 @@ $().ready(function() {
                 + " No change in policy count since "+ time.getHours() + ":" + format_time(time.getMinutes()) + "</p>";
             }
         });
-    }, 10000);
+    }, 1000);
+
+    setInterval(function() {
+        $.getJSON("/revenue", function(result){
+
+            document.getElementById("num_revenue").innerHTML =
+            "<br><p style=\"color: white\">Policy Count:<h1 style=\"color: white\">"
+             + result['num_revenue'] + "</h1></p>";
+
+            if (time == null) {
+                time = new Date();
+                document.getElementById("revenue_stats").innerHTML =
+                "<p style=\"color: white\"><i class=\"fa fa-history\"></i> No change in user count since "
+                + time.getHours() +  ":" + format_time(time.getMinutes()) + "</p>";
+            }
+            else if (result['num_revenue'] != user_count) {
+                user_count = result['num_revenue'];
+                time = new Date();
+                document.getElementById("revenue_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
+                + " No change in policy count since "+ time.getHours() + ":" + format_time(time.getMinutes()) + "</p>";
+            }
+            else {
+                document.getElementById("revenue_stats").innerHTML = "<p style=\"color: white\"><i class=\"fa fa-history\"></i>"
+                + " No change in policy count since "+ time.getHours() + ":" + format_time(time.getMinutes()) + "</p>";
+            }
+        });
+    }, 1000);
 
 
 

@@ -37,10 +37,12 @@ def get_number_policies():
     response = DBConnection.get_all_responses(query)
     return response[0][0]
 
+
 def get_revenue():
     query = 'SELECT COUNT(id) FROM "Insurance"."insurance_policies"'
     response = DBConnection.get_all_responses(query)
     return response[0][0]
+
 
 # render the page; let jQuery do the work
 class jsHandler(tornado.web.RequestHandler):
@@ -60,6 +62,7 @@ class ProfilesHandler(tornado.web.RequestHandler):
 class PoliciesHandler(tornado.web.RequestHandler):
     def get(self):
         self.write({'num_policies': get_number_policies()})
+
 
 class RevenueHandler(tornado.web.RequestHandler):
     def get(self):
