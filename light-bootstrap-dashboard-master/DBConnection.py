@@ -8,10 +8,14 @@ conn = psycopg2.connect(
     sslmode='require')
 cursor = conn.cursor()
 
+
 def get_all_responses(query):
-    cursor.execute(query)
-    response = cursor.fetchall()
-    return response
+    try:
+        cursor.execute(query)
+        response = cursor.fetchall()
+        return response
+    except:
+        return None
 
 
 def close_connection():
