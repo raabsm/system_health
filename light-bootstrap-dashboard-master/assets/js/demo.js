@@ -73,18 +73,10 @@ $().ready(function() {
 
     //api pings
     function ping() {
-        var apis = [{name: "Skywatch",
-                        info: {active: false,
-                                response_time: 1.002}
-                     },
-                     {name: "Database",
-                        info: {active: true,
-                                response_time: 0.102}
-                     },
-                     {name: "Airmap",
-                        info: {active: false,
-                                response_time: 0.034}
-                     }]
+        var list = $.getJSON("/api", function(result){
+            result;
+        })
+        var apis = list['list']
         var i;
         var result = "";
         for (i = 0; i < apis.length; i++) {
@@ -368,9 +360,12 @@ demo = {
 
         var data = {
             labels: ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'],
-            series: $.getJSON("/profiles", function(result){
-                    //get valid list of data and return it
-                }
+            series: [
+                [1, 2, 3, 4, 5, 6, 7]
+            ]
+//            $.getJSON("/profiles", function(result){
+//                    //get valid list of data and return it
+//                })
         };
 
         var options = {
