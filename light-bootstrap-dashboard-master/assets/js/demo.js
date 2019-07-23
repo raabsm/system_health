@@ -15,7 +15,16 @@ $().ready(function() {
 //        }
 //    };
 
-
+//              <div class = "row" id="metawidgets">
+//                <div class="col-md-4">
+//                    <div class="card ">
+//                        <div class="card-body" style="background-color: #5743AF">
+//                            <div class="widget" id="num_users" ></div>
+//                            <div id="user_stats"></div>
+//                        </div>
+//                    </div>
+//                </div>
+//              </div>
     function profiles() {
         $.getJSON("/profiles", function(result){
 
@@ -87,10 +96,12 @@ $().ready(function() {
                     var sign = "<i class=\"fa fa-circle text-danger\"></i>";
                 }
 
-                var response_time = apis[i]['info']['response_time'].toString();
+                var response_time = apis[i]['info']['response_time'];
+                response_time = parseFloat(response_time).toFixed(2);
+                response_time = response_time.toString();
 
                 result = result + "<div class=\"col-md-2\"> <div class=\"card \"> <div class=\"card-body\">" +
-                 "<div class=\"widget\" id=\"api\"><h3>" + apis[i]['name'] + "</h3><p>Response time: "+ response_time + " seconds</p>" + sign +
+                 "<div class=\"widget\" id=\"api\"><h3>" + apis[i]['name'] + "</h3><p>Response time:<br>"+ response_time + " seconds</p>" + sign +
                  "</div></div></div></div>";
             }
             document.getElementById("ping").innerHTML = result;
@@ -273,18 +284,19 @@ demo = {
     },
 
     initDashboardPageCharts: function() {$.getJSON("/profilegraphs", function(response){
-        var list = response["profiles_last_week"]
-        var info = list.reverse()
+
+        var info = response["profiles_last_week"].reverse();
         var data_labels = [];
         var data_series = [[], []];
         var i;
+
         for (i = 0; i < info.length; i++) {
             data_labels[i] = info[i]["date"];
             data_series[0][i] = info[i]["registered"];
             data_series[1][i] = info[i]["filled_profile"];
         }
+
         var data = {labels: data_labels, series: data_series};
-        console.log(data);
 
 
         var dataPreferences = {
