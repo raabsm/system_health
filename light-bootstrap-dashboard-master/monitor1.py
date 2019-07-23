@@ -96,7 +96,7 @@ class ProfileGraphHandler(tornado.web.RequestHandler):
                     'WHERE profiles.date_added > \'{0}\' AND profiles.date_added < \'{1}\''.format(day.strftime("%Y-%m-%d"),
                                                                                                    next_day.strftime("%Y-%m-%d"))
             response = query_database_all_responses(query)[0]
-            data['info'].append({'date': day.strftime("%m/%d"),
+            data['profiles_last_week'].append({'date': day.strftime("%m/%d"),
                                  'registered': response[0],
                                  'filled_profile': response[1]})
         self.write(data)

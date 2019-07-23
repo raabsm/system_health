@@ -1,3 +1,4 @@
+
 $().ready(function() {
 
     var user_count;
@@ -271,7 +272,20 @@ demo = {
         // lbd.startAnimationForLineChart(dailySalesChart);
     },
 
-    initDashboardPageCharts: function() {
+    initDashboardPageCharts: function() {$.getJSON("/profilegraphs", function(response){
+        var list = response["profiles_last_week"]
+        var info = list.reverse()
+        var data_labels = [];
+        var data_series = [[], []];
+        var i;
+        for (i = 0; i < info.length; i++) {
+            data_labels[i] = info[i]["date"];
+            data_series[0][i] = info[i]["registered"];
+            data_series[1][i] = info[i]["filled_profile"];
+        }
+        var data = {labels: data_labels, series: data_series};
+        console.log(data);
+
 
         var dataPreferences = {
             series: [
@@ -356,15 +370,9 @@ demo = {
 
         // lbd.startAnimationForLineChart(chartHours);
 
-        var data = {
-            labels: ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'],
-            series: [
-                [1, 2, 3, 4, 5, 6, 7]
-            ]
-        };
 
         var options = {
-            seriesBarDistance: 5,
+            seriesBarDistance: 10,
             axisX: {
                 showGrid: false
             },
@@ -466,7 +474,7 @@ demo = {
         // //start animation for the Emails Subscription Chart
         // lbd.startAnimationForBarChart(emailsSubscriptionChart);
 
-    },
+    })},
 
     initGoogleMaps: function() {
         var myLatlng = new google.maps.LatLng(40.748817, -73.985428);
@@ -622,4 +630,4 @@ demo = {
 
 
 
-}
+    }
