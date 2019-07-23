@@ -86,11 +86,21 @@ class ProfilesHandler(tornado.web.RequestHandler):
 class GraphHandler(tornado.web.RequestHandler):
     def get(self):
         graph_data = {'graphs': {'profiles_last_week': {'title': 'Profiles Last Week',
-                                                   'data': []},
-                            'revenue_last_week': {'title': 'Revenue Last Week',
-                                                   'data': []}
-                            }
-                }
+                                                        'key': {'x': 'Date',
+                                                                'y1': 'Registered',
+                                                                'y2': 'Filled Profile'
+                                                                },
+                                                        'data': []
+                                                        },
+                                 'revenue_last_week': {'title': 'Revenue Last Week',
+                                                       'key': {'x': 'Date',
+                                                               'y1': 'Revenue'
+                                                               },
+                                                       'data': []
+                                                       }
+                                 }
+                      }
+
         today = datetime.datetime.today()
         for num in range(0, 7):
             day = (today - datetime.timedelta(days=num+1))
@@ -101,9 +111,9 @@ class GraphHandler(tornado.web.RequestHandler):
                     'WHERE profiles.date_added > \'{0}\' AND profiles.date_added < \'{1}\''.format(day.strftime("%Y-%m-%d"),
                                                                                                    next_day.strftime("%Y-%m-%d"))
             response = query_database_all_responses(query)[0]
-            graph_data['graphs']['profiles_last_week']['data'].append({'date': day.strftime("%m/%d"),
-                                 'registered': response[0],
-                                 'filled_profile': response[1]})
+            graph_data['graphs']['profiles_last_week']['data'].append({'x': day.strftime("%m/%d"),
+                                 'y1': response[0],
+                                 'y2': response[1]})
 
         for num in range(0, 7):
             day = (today - datetime.timedelta(days=num+1))
@@ -112,10 +122,9 @@ class GraphHandler(tornado.web.RequestHandler):
                     'WHERE purchases.date_added > \'{0}\' AND purchases.date_added < \'{1}\''.format(day.strftime("%Y-%m-%d"),
                                                                                                    next_day.strftime("%Y-%m-%d"))
             response = query_database_all_responses(query)[0]
-            graph_data['graphs']['revenue_last_week']['data'].append({'date': day.strftime("%m/%d"),
-                                                                      'revenue': response[0]})
-        print(graph_data)
-        #self.write(graph_data)
+            graph_data['graphs']['revenue_last_week']['data'].append({'x': day.strftime("%m/%d"),
+                                                                      'y1': response[0]})
+        self.write(graph_data)
 
 
 class PoliciesHandler(tornado.web.RequestHandler):
