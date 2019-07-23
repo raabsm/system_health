@@ -15,18 +15,18 @@ tornado.options.define('port', default=8889, help='port to listen on')
 
 
 # return an object containing info for each widget
-# def widget_properties(name, url):
-#     try:
-#         string = []
-#         request = requests.get(url)
-#         r = json.loads(request.text)
-#         responsetime = "Response time: " + str(round(request.elapsed.total_seconds(), 2)) + "s"
-#         stamp = "Query: " + str(datetime.datetime.now())
-#         # string.extend(widget_specs(name, r, datetime.datetime.now(), round(request.elapsed.total_seconds(), 2)))
-#         string.extend((responsetime, stamp))
-#         return {name: {url: string}}
-#     except:
-#         print("Couldn't get widget properties")
+    # def widget_properties(name, url):
+    #     try:
+    #         string = []
+    #         request = requests.get(url)
+    #         r = json.loads(request.text)
+    #         responsetime = "Response time: " + str(round(request.elapsed.total_seconds(), 2)) + "s"
+    #         stamp = "Query: " + str(datetime.datetime.now())
+    #         # string.extend(widget_specs(name, r, datetime.datetime.now(), round(request.elapsed.total_seconds(), 2)))
+    #         string.extend((responsetime, stamp))
+    #         return {name: {url: string}}
+    #     except:
+    #         print("Couldn't get widget properties")
 
 
 def query_database_single_response(query):
@@ -114,7 +114,6 @@ class GraphHandler(tornado.web.RequestHandler):
             graph_data['graphs']['profiles_last_week']['data'].append({'x': day.strftime("%m/%d"),
                                  'y1': response[0],
                                  'y2': response[1]})
-
         for num in range(0, 7):
             day = (today - datetime.timedelta(days=num+1))
             next_day = day + datetime.timedelta(days=1)

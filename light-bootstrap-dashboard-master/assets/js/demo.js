@@ -273,16 +273,17 @@ demo = {
         // lbd.startAnimationForLineChart(dailySalesChart);
     },
 
-    initDashboardPageCharts: function(urls) {
-    var i;
-    for(i=0; i < urls.length; i++){
-        var link = "/" + urls[i];
-        $.getJSON(link, function(response){
+    initDashboardPageCharts: function() {
+        $.getJSON("/graphs", function(response){
 
 
-            var key = response['url'];
+            var dict = response['graphs'];
 
-            var info = response[key].reverse();
+            for(var key in dict) {
+
+            var val = dict[key];
+
+            var info = val['data'].reverse();
             var data_labels = [];
             var data_series = [[], []];
             var j;
@@ -297,6 +298,45 @@ demo = {
 
             var data = {labels: data_labels, series: data_series};
             console.log(data);
+
+
+
+            var options = {
+                seriesBarDistance: 10,
+                axisX: {
+                    showGrid: false
+                },
+                height: "245px"
+            };
+
+            var responsiveOptions = [
+                ['screen and (max-width: 640px)', {
+                    seriesBarDistance: 5,
+                    axisX: {
+                        labelInterpolationFnc: function(value) {
+                            return value[0];
+                        }
+                    }
+                }]
+            ];
+
+            var id ="#chartActivity" + key;
+            $('#bar-charts').append("<div class=\"col-md-5\"><div class=\"card \">" +
+            "<div class=\"card-header \"><h4 class=\"card-title\">" + val['title'] +"</h4></div><div class=\"card-body \" id=\"chart\">"+
+            "<div id=\"" + id + "\" class=\"ct-chart\"></div></div><br><div class=\"card-footer \">" +
+            "<i class=\"fa fa-circle text-info\"></i>" + val['keys']['y1']+ "<i class=\"fa fa-circle text-danger\"></i>"+
+            if(val['keys']['y2']){
+                val['keys']['y2'] + "<hr><div class=\"stats\"><i class=\"fa fa-check\">
+            }
+            else {
+                ""
+            }
+            + "</i> Data information certified"+
+            "</div></div></div></div>");
+            var chartActivity = Chartist.Bar(id, data, options, responsiveOptions);
+            }
+
+
 
 
             var dataPreferences = {
@@ -385,37 +425,6 @@ demo = {
     //        }
 
             // lbd.startAnimationForLineChart(chartHours);
-
-
-            var options = {
-                seriesBarDistance: 10,
-                axisX: {
-                    showGrid: false
-                },
-                height: "245px"
-            };
-
-            var responsiveOptions = [
-                ['screen and (max-width: 640px)', {
-                    seriesBarDistance: 5,
-                    axisX: {
-                        labelInterpolationFnc: function(value) {
-                            return value[0];
-                        }
-                    }
-                }]
-            ];
-
-            var id = "chartActivity" + key;
-            document.getElementById("bar-charts").innerHTML = "<div class=\"col-md-5\"><div class=\"card \">" +
-            "<div class=\"card-header \"><h4 class=\"card-title\">" + key +"</h4></div><div class=\"card-body \" id=\"chart\">"+
-            "<div id=\"" + id + "\" class=\"ct-chart\"></div></div><br><div class=\"card-footer \">" +
-            "<i class=\"fa fa-circle text-info\"></i> Registered users<i class=\"fa fa-circle text-danger\"></i>"+
-            "Filled profile<hr><div class=\"stats\"><i class=\"fa fa-check\"></i> Data information certified"+
-            "</div></div></div></div>";
-            id = "#" + id;
-            var chartActivity = Chartist.Bar(id, data, options, responsiveOptions);
-
             // lbd.startAnimationForBarChart(chartActivity);
 
             // /* ----------==========     Daily Sales Chart initialization    ==========---------- */
@@ -498,8 +507,8 @@ demo = {
             // //start animation for the Emails Subscription Chart
             // lbd.startAnimationForBarChart(emailsSubscriptionChart);
 
-        })}
-    },
+
+        })},
 
     initGoogleMaps: function() {
         var myLatlng = new google.maps.LatLng(40.748817, -73.985428);
