@@ -73,34 +73,32 @@ $().ready(function() {
 
     //api pings
     function ping() {
-        var list = $.getJSON("/api", function(result){
-            result;
-        })
-        var apis = list['list']
-        var i;
-        var result = "";
-        for (i = 0; i < apis.length; i++) {
+        $.getJSON("/api", function(data){
+            var apis = data['api'];
+            var i;
+            var result = "";
+            for (i = 0; i < apis.length; i++) {
 
-            if (apis[i]['info']['active']) {
-                var sign = "<i class=\"fa fa-circle text-info\"></i>";
+                if (apis[i]['info']['active']) {
+                    var sign = "<i class=\"fa fa-circle text-success\"></i>";
+                }
+                else {
+                    var sign = "<i class=\"fa fa-circle text-danger\"></i>";
+                }
+
+                var response_time = apis[i]['info']['response_time'].toString();
+
+                result = result + "<div class=\"col-md-2\"> <div class=\"card \"> <div class=\"card-body\">" +
+                 "<div class=\"widget\" id=\"api\"><h3>" + apis[i]['name'] + "</h3><p>Response time: "+ response_time + " seconds</p>" + sign +
+                 "</div></div></div></div>";
             }
-            else {
-                var sign = "<i class=\"fa fa-circle text-danger\"></i>";
-            }
-
-            var response_time = apis[i]['info']['response_time'].toString();
-
-            result = result + "<div class=\"col-md-2\"> <div class=\"card \"> <div class=\"card-body\">" +
-             "<div class=\"widget\" id=\"api\"><h3>" + apis[i]['name'] + "</h3><p>Response time: "+ response_time + " seconds</p>" + sign +
-             "</div></div></div></div>";
-        }
-        document.getElementById("ping").innerHTML = result;
-    }
+            document.getElementById("ping").innerHTML = result;
+        })};
 
     ping();
     setInterval(function() {
         ping();
-    }, 1000);
+    }, 60000);
 
     $sidebar = $('.sidebar');
     $sidebar_img_container = $sidebar.find('.sidebar-background');
@@ -252,7 +250,7 @@ demo = {
             series: [
                 [12, 17, 7, 17, 23, 18, 38]
             ]
-        };
+        }
 
         optionsDailySalesChart = {
             lineSmooth: Chartist.Interpolation.cardinal({
@@ -363,9 +361,6 @@ demo = {
             series: [
                 [1, 2, 3, 4, 5, 6, 7]
             ]
-//            $.getJSON("/profiles", function(result){
-//                    //get valid list of data and return it
-//                })
         };
 
         var options = {

@@ -42,8 +42,8 @@ def add_api_data(dictionary, api_name, response):
     else:
         active = True
     response_time = str(response.elapsed.total_seconds())
-    print(type(response.elapsed))
-    dictionary['api'].append({api_name: {'active': active,
+    # print(type(response.elapsed))
+    dictionary['api'].append({'name': api_name, 'info': {'active': active,
                              'response_time': response_time}})
     return dictionary
 
@@ -100,7 +100,7 @@ class ApiHandler(tornado.web.RequestHandler):
         add_api_data(data, 'hazard_api', hazard_response)
         add_api_data(data, 'skywatch_api', skywatch_response)
         self.test_database(data)
-        print(data)
+        # print(data)
         self.write(data)
 
     def query_hazard_service(self, lat, lng, radius, url):
@@ -121,9 +121,10 @@ class ApiHandler(tornado.web.RequestHandler):
         else:
             active = False
             response_time = 0
-        dictionary['api'].append({'DataBase': {'active': active,
+        dictionary['api'].append({'name': 'DataBase', 'info': {'active': active,
                                   'response_time': str(response_time)}})
         return dictionary
+
 
     def query_skywatch_api(self):
         skywatch_api = 'http://api.us-dev.skywatch.ai/api/insurances/offers'
