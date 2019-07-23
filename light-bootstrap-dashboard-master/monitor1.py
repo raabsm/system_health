@@ -11,7 +11,7 @@ import DBConnection
 import time
 
 
-tornado.options.define('port', default=8888, help='port to listen on')
+tornado.options.define('port', default=8889, help='port to listen on')
 
 
 # return an object containing info for each widget
