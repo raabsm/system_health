@@ -29,11 +29,18 @@ def widget_properties(name, url):
         print("Couldn't get widget properties")
 
 
-def query_database(query):
+def query_database_single_response(query):
     response = DBConnection.get_all_responses(query)
     if response is None:
         return None
     return response[0][0]
+
+
+def query_database_all_responses(query):
+    response = DBConnection.get_all_responses(query)
+    if response is None:
+        return None
+    return response
 
 
 def add_api_data(dictionary, api_name, response):
@@ -70,16 +77,35 @@ class ProfilesHandler(tornado.web.RequestHandler):
         last_week = (today - datetime.timedelta(days=7))
         profiles_last_week_query = total_profiles_query \
                              + ' WHERE date_added > \'{0}\''.format(last_week.strftime("%Y-%m-%d"))
-        data = {'total_profiles': query_database(total_profiles_query),
-                'most_recently_added': query_database(last_profile_added).strftime("%H:%M"),
-                'total_last_week': query_database(profiles_last_week_query)}
+        data = {'total_profiles': query_database_single_response(total_profiles_query),
+                'most_recently_added': query_database_single_response(last_profile_added).strftime("%H:%M"),
+                'total_last_week': query_database_single_response(profiles_last_week_query)}
+        self.write(data)
+
+
+class ProfileGraphHandler(tornado.web.RequestHandler):
+    def get(self):
+        data = {'profiles_last_week': []}
+        today = datetime.datetime.today()
+        for num in range(0,7):
+            day = (today - datetime.timedelta(days=num+1))
+            next_day = day + datetime.timedelta(days=1)
+            query = 'SELECT count(profiles.id), count(addresses.address1) ' \
+                    'FROM "User"."profiles" profiles ' \
+                    'INNER JOIN "User"."addresses" addresses ON (profiles.id = addresses.user_profile_id) ' \
+                    'WHERE profiles.date_added > \'{0}\' AND profiles.date_added < \'{1}\''.format(day.strftime("%Y-%m-%d"),
+                                                                                                   next_day.strftime("%Y-%m-%d"))
+            response = query_database_all_responses(query)[0]
+            data['info'].append({'date': day.strftime("%m/%d"),
+                                 'registered': response[0],
+                                 'filled_profile': response[1]})
         self.write(data)
 
 
 class PoliciesHandler(tornado.web.RequestHandler):
     def get(self):
         total_policies_query = 'SELECT COUNT(id) FROM "Insurance"."insurance_policies"'
-        self.write({'total_policies': query_database(total_policies_query)})
+        self.write({'total_policies': query_database_single_response(total_policies_query)})
 
 
 class RevenueHandler(tornado.web.RequestHandler):
@@ -88,8 +114,8 @@ class RevenueHandler(tornado.web.RequestHandler):
         total_revenue_query = 'SELECT SUM(final_price) FROM "Insurance"."insurance_purchases"'
         today = datetime.datetime.today()
         revenue_today = total_revenue_query + ' WHERE date_added > \'{}\''.format(today.strftime("%Y-%m-%d"))
-        self.write({'total_revenue': currency + str(round(query_database(total_revenue_query))),
-                    'revenue_today': currency + str(round(query_database(revenue_today)))})
+        self.write({'total_revenue': currency + str(round(query_database_single_response(total_revenue_query))),
+                    'revenue_today': currency + str(round(query_database_single_response(revenue_today)))})
 
 
 class ApiHandler(tornado.web.RequestHandler):
@@ -100,7 +126,6 @@ class ApiHandler(tornado.web.RequestHandler):
         add_api_data(data, 'hazard_api', hazard_response)
         add_api_data(data, 'skywatch_api', skywatch_response)
         self.test_database(data)
-        # print(data)
         self.write(data)
 
     def query_hazard_service(self, lat, lng, radius, url):
@@ -113,7 +138,7 @@ class ApiHandler(tornado.web.RequestHandler):
     def test_database(self, dictionary):
         example_query = 'SELECT id FROM "Insurance"."insurance_policies"'
         start_time = time.time()
-        response = query_database(example_query)
+        response = query_database_single_response(example_query)
         end_time = time.time()
         if response is not None:
             active = True
@@ -174,6 +199,7 @@ def application():
                 (r"/policies", PoliciesHandler),
                 (r"/revenue", RevenueHandler),
                 (r"/api", ApiHandler),
+                (r"/profilegraphs", ProfileGraphHandler),
                 (r"/assets/css/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/css"},),
                 (r"/assets/js/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/js"},),
                 (r"/assets/js/core/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/js/core"},),
