@@ -83,11 +83,16 @@ class ProfilesHandler(tornado.web.RequestHandler):
         self.write(data)
 
 
-class ProfileGraphHandler(tornado.web.RequestHandler):
+class GraphHandler(tornado.web.RequestHandler):
     def get(self):
-        data = {'url': 'profilegraphs', 'profilegraphs': []}
+        graph_data = {'graphs': {'profiles_last_week': {'title': 'Profiles Last Week',
+                                                   'data': []},
+                            'revenue_last_week': {'title': 'Revenue Last Week',
+                                                   'data': []}
+                            }
+                }
         today = datetime.datetime.today()
-        for num in range(0,7):
+        for num in range(0, 7):
             day = (today - datetime.timedelta(days=num+1))
             next_day = day + datetime.timedelta(days=1)
             query = 'SELECT count(profiles.id), count(addresses.address1) ' \
@@ -96,10 +101,21 @@ class ProfileGraphHandler(tornado.web.RequestHandler):
                     'WHERE profiles.date_added > \'{0}\' AND profiles.date_added < \'{1}\''.format(day.strftime("%Y-%m-%d"),
                                                                                                    next_day.strftime("%Y-%m-%d"))
             response = query_database_all_responses(query)[0]
-            data['profilegraphs'].append({'x': day.strftime("%m/%d"),
-                                 'y1': response[0],
-                                 'y2': response[1]})
-        self.write(data)
+            graph_data['graphs']['profiles_last_week']['data'].append({'date': day.strftime("%m/%d"),
+                                 'registered': response[0],
+                                 'filled_profile': response[1]})
+
+        for num in range(0, 7):
+            day = (today - datetime.timedelta(days=num+1))
+            next_day = day + datetime.timedelta(days=1)
+            query = 'SELECT SUM(final_price) FROM "Insurance"."insurance_purchases" purchases ' \
+                    'WHERE purchases.date_added > \'{0}\' AND purchases.date_added < \'{1}\''.format(day.strftime("%Y-%m-%d"),
+                                                                                                   next_day.strftime("%Y-%m-%d"))
+            response = query_database_all_responses(query)[0]
+            graph_data['graphs']['revenue_last_week']['data'].append({'date': day.strftime("%m/%d"),
+                                                                      'revenue': response[0]})
+        print(graph_data)
+        #self.write(graph_data)
 
 
 class PoliciesHandler(tornado.web.RequestHandler):
@@ -185,7 +201,7 @@ class ApiHandler(tornado.web.RequestHandler):
                     ]
                 }
             },
-            "start_time": 1563885267000
+            "start_time": 8563885267000
         }
         response = requests.post(skywatch_api, json=data_to_input)
         return response
@@ -199,7 +215,7 @@ def application():
                 (r"/policies", PoliciesHandler),
                 (r"/revenue", RevenueHandler),
                 (r"/api", ApiHandler),
-                (r"/profilegraphs", ProfileGraphHandler),
+                (r"/graphs", GraphHandler),
                 (r"/assets/css/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/css"},),
                 (r"/assets/js/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/js"},),
                 (r"/assets/js/core/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/js/core"},),
