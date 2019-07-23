@@ -14,17 +14,6 @@ $().ready(function() {
 //            return num.toString();
 //        }
 //    };
-
-//              <div class = "row" id="metawidgets">
-//                <div class="col-md-4">
-//                    <div class="card ">
-//                        <div class="card-body" style="background-color: #5743AF">
-//                            <div class="widget" id="num_users" ></div>
-//                            <div id="user_stats"></div>
-//                        </div>
-//                    </div>
-//                </div>
-//              </div>
     function profiles() {
         $.getJSON("/profiles", function(result){
 
@@ -50,7 +39,7 @@ $().ready(function() {
         $.getJSON("/policies", function(result){
 
             document.getElementById("num_policies").innerHTML =
-            "<br><p style=\"color: white\">Policy Count:<h1 style=\"color: white\">"
+            "<br><p style=\"color: white\">Policy count: <h1 style=\"color: white\">"
              + result['total_policies'] + "</h1></p>";
         });
     };
@@ -106,11 +95,12 @@ $().ready(function() {
             }
             document.getElementById("ping").innerHTML = result;
         })};
-
     ping();
     setInterval(function() {
         ping();
     }, 60000);
+
+//=====================================================================================================================//
 
     $sidebar = $('.sidebar');
     $sidebar_img_container = $sidebar.find('.sidebar-background');
@@ -283,17 +273,10 @@ demo = {
         // lbd.startAnimationForLineChart(dailySalesChart);
     },
 
-    initDashboardPageCharts: function() {
+    initDashboardPageCharts: function(urls) {
     var i;
-    var urls = ["profilegraphs"];
-
-
     for(i=0; i < urls.length; i++){
         var link = "/" + urls[i];
-        console.log(link);
-        var key = "" + urls[i];
-        console.log(key);
-
         $.getJSON(link, function(response){
 
 
@@ -422,27 +405,6 @@ demo = {
                     }
                 }]
             ];
-
-    //
-    //        <div class="col-md-5">
-    //                    <div class="card ">
-    //                        <div class="card-header ">
-    //                            <h4 class="card-title">Registered users in the last week</h4>
-    //<!--                            <p class="card-category">All products including Taxes</p>-->
-    //                        </div>
-    //                        <div class="card-body " id="chart">
-    //<!--                            <div id="chartActivityProfile" class="ct-chart"></div>-->
-    //                        </div>
-    //                        <div class="card-footer ">
-    //                                <i class="fa fa-circle text-info"></i> Registered users
-    //                                <i class="fa fa-circle text-danger"></i> Filled profile
-    //                            <hr>
-    //                            <div class="stats">
-    //                                <i class="fa fa-check"></i> Data information certified
-    //                            </div>
-    //                        </div>
-    //                    </div>
-    //                </div>
 
             var id = "chartActivity" + key;
             document.getElementById("bar-charts").innerHTML = "<div class=\"col-md-5\"><div class=\"card \">" +

@@ -78,14 +78,10 @@
                     </div>
                 </div>
             </div>
-
-            // Charts
             <div class="row" id="bar-charts">
             </div>
-
             <h1>Task 2</h1>
             <div class="row" id="ping"></div>
-
             <div class="row">
                 <div class="col-md-6">
                     <div class="card ">
@@ -351,10 +347,15 @@
 <script src="assets/js/demo.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
+
+        // names of links
+        var urls = ["profilegraphs", "revenue"];
+
+
         // Javascript method's body can be found in assets/js/demos.js
-        demo.initDashboardPageCharts();
+        // Refresh every 24 hours
+        demo.initDashboardPageCharts(urls);
+        setInterval(demo.initDashboardPageCharts(urls), 86400000);
     });
-
 </script>
-
 </html>
