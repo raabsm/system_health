@@ -5,6 +5,7 @@ import tornado.options
 import datetime
 import requests
 import json
+from dateutil.relativedelta import relativedelta
 import DBConnection
 # import zlib
 # import pybase64
@@ -85,50 +86,65 @@ class ProfilesHandler(tornado.web.RequestHandler):
 
 class GraphHandler(tornado.web.RequestHandler):
     def get(self):
-        graph_data = {'graphs': {'profiles_last_week': {'title': 'Profiles Last Week',
+        self.graph_data = {'graphs': {'profiles_last_week': {'title': 'Profiles Last Week',
                                                         'key': {'x': 'Date',
                                                                 'y1': 'Registered',
                                                                 'y2': 'Filled Profile'
                                                                 },
                                                         'data': []
-                                                        },
+                                                            },
                                  'revenue_last_week': {'title': 'Revenue Last Week',
                                                        'key': {'x': 'Date',
                                                                'y1': 'Revenue'
                                                                },
                                                        'data': []
-                                                       }
-                                 }
-                      }
+                                                       },
+                           'revenue_last_month': {'title': 'Revenue Last Month',
+                                                 'key': {'x': 'Month',
+                                                         'y1': 'Revenue'
+                                                         },
+                                                 'data': []
+                                                  }
+                                      }
+                           }
+        profiles_last_week_query = 'SELECT count(profiles.id), count(addresses.address1) ' \
+                                  'FROM "User"."profiles" profiles ' \
+                                  'INNER JOIN "User"."addresses" addresses ON (profiles.id = addresses.user_profile_id) ' \
+                                  'WHERE profiles.date_added > \'{0}\' AND profiles.date_added < \'{1}\''
+        revenue_last_week_query = 'SELECT SUM(final_price) FROM "Insurance"."insurance_purchases" purchases ' \
+                                  'WHERE purchases.date_added > \'{0}\' AND purchases.date_added < \'{1}\''
+        revenue_last_month_query = revenue_last_week_query
 
+        self.fill_graph('profiles_last_week', "%m/%d", profiles_last_week_query, two_y=True)
+        self.fill_graph('revenue_last_week', "%m/%d", revenue_last_week_query, two_y=False)
+        self.fill_graph('revenue_last_month', "%b", revenue_last_month_query, days=False, two_y=False)
+        self.write(self.graph_data)
+
+    def fill_graph(self, graph_name,  formatted_date, query, days=True, two_y=False):
         today = datetime.datetime.today()
         for num in range(0, 7):
-            day = (today - datetime.timedelta(days=num+1))
-            next_day = day + datetime.timedelta(days=1)
-            query = 'SELECT count(profiles.id), count(addresses.address1) ' \
-                    'FROM "User"."profiles" profiles ' \
-                    'INNER JOIN "User"."addresses" addresses ON (profiles.id = addresses.user_profile_id) ' \
-                    'WHERE profiles.date_added > \'{0}\' AND profiles.date_added < \'{1}\''.format(day.strftime("%Y-%m-%d"),
-                                                                                                   next_day.strftime("%Y-%m-%d"))
-            response = query_database_all_responses(query)[0]
-            graph_data['graphs']['profiles_last_week']['data'].append({'x': day.strftime("%m/%d"),
-                                 'y1': response[0],
-                                 'y2': response[1]})
-        for num in range(0, 7):
-            day = (today - datetime.timedelta(days=num+1))
-            next_day = day + datetime.timedelta(days=1)
-            query = 'SELECT SUM(final_price) FROM "Insurance"."insurance_purchases" purchases ' \
-                    'WHERE purchases.date_added > \'{0}\' AND purchases.date_added < \'{1}\''.format(day.strftime("%Y-%m-%d"),
-                                                                                                   next_day.strftime("%Y-%m-%d"))
-            response = query_database_all_responses(query)[0]
-            graph_data['graphs']['revenue_last_week']['data'].append({'x': day.strftime("%m/%d"),
+            if days:
+                day = (today - relativedelta(days=num+1))
+                next_day = day + datetime.timedelta(days=1)
+            else:
+                day = (today - relativedelta(months=num + 1, day=1))
+                next_day = day + relativedelta(months= 1, day=1)
+                print(day.strftime("%Y-%m-%d"), next_day.strftime("%Y-%m-%d"))
+            db_query = query.format(day.strftime("%Y-%m-%d"), next_day.strftime("%Y-%m-%d"))
+            response = query_database_all_responses(db_query)[0]
+            if two_y:
+                self.graph_data['graphs'][graph_name]['data'].append({'x': day.strftime("%m/%d"),
+                                                                      'y1': response[0],
+                                                                      'y2': response[1]})
+            else:
+                self.graph_data['graphs'][graph_name]['data'].append({'x': day.strftime(formatted_date),
                                                                       'y1': response[0]})
-        self.write(graph_data)
 
 
 class PoliciesHandler(tornado.web.RequestHandler):
     def get(self):
-        total_policies_query = 'SELECT COUNT(id) FROM "Insurance"."insurance_policies"'
+        total_policies_query = 'SELECT COUNT(id) FROM "Insurance"."insurance_purchases"' \
+                               'WHERE is_canceled = false'
         self.write({'total_policies': query_database_single_response(total_policies_query)})
 
 
