@@ -18,9 +18,9 @@ $().ready(function() {
         $.getJSON("/profiles", function(result){
 
             document.getElementById("num_users").innerHTML =
-            "<br><p style=\"color: white\">Total User Count:<h1 style=\"color: white\">"
+            "<br><p style=\"color: #5743AF\">Total User Count:<h1 style=\"color: #5743AF\">"
              + result['total_profiles'] + "</h1></p><p style=\"color: #5743AF\">Joined in last week:"
-             + "<h2 style=\"color: white\">" + result['total_last_week'] + "</h2></p>";
+             + "<h2 style=\"color: #5743AF\">" + result['total_last_week'] + "</h2></p>";
 
 
             if (result['num_profiles'] != user_count) {
@@ -39,7 +39,7 @@ $().ready(function() {
         $.getJSON("/policies", function(result){
 
             document.getElementById("num_policies").innerHTML =
-            "<br><p style=\"color: white\">Policy count: <h1 style=\"color: #5743AF\">"
+            "<br><p style=\"color: #5743AF\">Policy count: <h1 style=\"color: #5743AF\">"
              + result['total_policies'] + "</h1></p>";
         });
     };
@@ -48,7 +48,7 @@ $().ready(function() {
         $.getJSON("/revenue", function(result){
 
             document.getElementById("revenue").innerHTML =
-            "<br><p style=\"color: white\">Total Revenue:<h1 style=\"color: white\">"
+            "<br><p style=\"color: #5743AF\">Total Revenue:<h1 style=\"color: #5743AF\">"
              + result['total_revenue'] + "</h1></p><p style=\"color: #5743AF\">Revenue today:"
              + "<h2 style=\"color: #5743AF\">" + result['revenue_today'] + "</h2></p>";
         });
