@@ -273,6 +273,9 @@ demo = {
         // lbd.startAnimationForLineChart(dailySalesChart);
     },
 
+
+//=====================================================================================================================/
+
     initDashboardPageCharts: function() {
         $.getJSON("/graphs", function(response){
 
@@ -299,8 +302,6 @@ demo = {
             var data = {labels: data_labels, series: data_series};
             console.log(data);
 
-
-
             var options = {
                 seriesBarDistance: 10,
                 axisX: {
@@ -320,23 +321,22 @@ demo = {
                 }]
             ];
 
-            var id ="#chartActivity" + key;
-            $('#bar-charts').append("<div class=\"col-md-5\"><div class=\"card \">" +
+            var second_val = "";
+            console.log(val['key']);
+            if('y2' in val['key']) {
+                second_val = "<i class=\"fa fa-circle text-danger\"></i>" + val['key']['y2'];
+            }
+
+            var id = "chartActivity" + key;
+            $("#bar-charts").append("<div class=\"col-md-5\"><div class=\"card \">" +
             "<div class=\"card-header \"><h4 class=\"card-title\">" + val['title'] +"</h4></div><div class=\"card-body \" id=\"chart\">"+
             "<div id=\"" + id + "\" class=\"ct-chart\"></div></div><br><div class=\"card-footer \">" +
-            "<i class=\"fa fa-circle text-info\"></i>" + val['keys']['y1']+ "<i class=\"fa fa-circle text-danger\"></i>"+
-            if(val['keys']['y2']){
-                val['keys']['y2'] + "<hr><div class=\"stats\"><i class=\"fa fa-check\">
-            }
-            else {
-                ""
-            }
-            + "</i> Data information certified"+
-            "</div></div></div></div>");
+            "<i class=\"fa fa-circle text-info\"></i>" + val['key']['y1'] + second_val + "<hr>" +
+            "<div class=\"stats\"><i class=\"fa fa-check\"></i> Data information certified</div>" +
+            "</div></div></div>");
+            id = "#" + id;
             var chartActivity = Chartist.Bar(id, data, options, responsiveOptions);
             }
-
-
 
 
             var dataPreferences = {
@@ -425,6 +425,7 @@ demo = {
     //        }
 
             // lbd.startAnimationForLineChart(chartHours);
+-->
             // lbd.startAnimationForBarChart(chartActivity);
 
             // /* ----------==========     Daily Sales Chart initialization    ==========---------- */
