@@ -93,18 +93,18 @@ class GraphHandler(tornado.web.RequestHandler):
                                                                 },
                                                         'data': []
                                                             },
-                                 'revenue_last_week': {'title': 'Revenue Last Week',
+                                    'revenue_last_week': {'title': 'Revenue Last Week',
                                                        'key': {'x': 'Date',
                                                                'y1': 'Revenue'
                                                                },
                                                        'data': []
                                                        },
-                           'revenue_last_month': {'title': 'Revenue Last Month',
-                                                 'key': {'x': 'Month',
-                                                         'y1': 'Revenue'
-                                                         },
-                                                 'data': []
-                                                  }
+                                    'revenue_last_month': {'title': 'Revenue Last Month',
+                                                        'key': {'x': 'Month',
+                                                                 'y1': 'Revenue'
+                                                                 },
+                                                        'data': []
+                                                        }
                                       }
                            }
         profiles_last_week_query = 'SELECT count(profiles.id), count(addresses.address1) ' \

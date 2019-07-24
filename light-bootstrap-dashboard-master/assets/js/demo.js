@@ -328,7 +328,7 @@ demo = {
             }
 
             var id = "chartActivity" + key;
-            $("#bar-charts").append("<div class=\"col-md-5\"><div class=\"card \">" +
+            $("#bar-charts").append("<div class=\"col-md-6\"><div class=\"card \">" +
             "<div class=\"card-header \"><h4 class=\"card-title\">" + val['title'] +"</h4></div><div class=\"card-body \" id=\"chart\">"+
             "<div id=\"" + id + "\" class=\"ct-chart\"></div></div><br><div class=\"card-footer \">" +
             "<i class=\"fa fa-circle text-info\"></i>" + val['key']['y1'] + second_val + "<hr>" +
