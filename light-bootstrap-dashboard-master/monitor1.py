@@ -15,19 +15,8 @@ import time
 tornado.options.define('port', default=8889, help='port to listen on')
 
 
-# return an object containing info for each widget
-    # def widget_properties(name, url):
-    #     try:
-    #         string = []
-    #         request = requests.get(url)
-    #         r = json.loads(request.text)
-    #         responsetime = "Response time: " + str(round(request.elapsed.total_seconds(), 2)) + "s"
-    #         stamp = "Query: " + str(datetime.datetime.now())
-    #         # string.extend(widget_specs(name, r, datetime.datetime.now(), round(request.elapsed.total_seconds(), 2)))
-    #         string.extend((responsetime, stamp))
-    #         return {name: {url: string}}
-    #     except:
-    #         print("Couldn't get widget properties")
+def format_number(entry):
+    return "{:,}".format(round(entry))
 
 
 def query_database_single_response(query):
@@ -78,9 +67,9 @@ class ProfilesHandler(tornado.web.RequestHandler):
         last_week = (today - datetime.timedelta(days=7))
         profiles_last_week_query = total_profiles_query \
                              + ' WHERE date_added > \'{0}\''.format(last_week.strftime("%Y-%m-%d"))
-        data = {'total_profiles': query_database_single_response(total_profiles_query),
+        data = {'total_profiles': format_number(query_database_single_response(total_profiles_query)),
                 'most_recently_added': query_database_single_response(last_profile_added).strftime("%H:%M"),
-                'total_last_week': query_database_single_response(profiles_last_week_query)}
+                'total_last_week': format_number(query_database_single_response(profiles_last_week_query))}
         self.write(data)
 
 
@@ -89,7 +78,8 @@ class GraphHandler(tornado.web.RequestHandler):
         self.graph_data = {'graphs': {'profiles_last_week': {'title': 'Weekly Profile Increase',
                                                         'key': {'x': 'Date',
                                                                 'y1': 'Registered',
-                                                                'y2': 'Filled Profile'
+                                                                'y2': 'Filled address info',
+                                                                'y3': 'Filled card info'
                                                                 },
                                                         'data': []
                                                             },
@@ -107,20 +97,20 @@ class GraphHandler(tornado.web.RequestHandler):
                                                         }
                                     }
                            }
-        profiles_last_week_query = 'SELECT count(profiles.id), count(addresses.address1) ' \
+        profiles_last_week_query = 'SELECT count(profiles.id), count(addresses.address1), count(profiles.stripe_customer_id)' \
                                    'FROM "User"."profiles" profiles ' \
                                    'INNER JOIN "User"."addresses" addresses ON (profiles.id = addresses.user_profile_id) ' \
-                                  'WHERE profiles.date_added > \'{0}\' AND profiles.date_added < \'{1}\''
+                                   'WHERE profiles.date_added > \'{0}\' AND profiles.date_added < \'{1}\''
         revenue_last_week_query = 'SELECT SUM(final_price) FROM "Insurance"."insurance_purchases" purchases ' \
                                   'WHERE purchases.date_added > \'{0}\' AND purchases.date_added < \'{1}\''
         revenue_last_month_query = revenue_last_week_query
 
-        self.fill_graph('profiles_last_week', "%m/%d", profiles_last_week_query, two_y=True)
-        self.fill_graph('revenue_last_week', "%m/%d", revenue_last_week_query, two_y=False)
-        self.fill_graph('revenue_last_month', "%b", revenue_last_month_query, days=False, two_y=False)
+        self.fill_graph('profiles_last_week', "%m/%d", profiles_last_week_query, y_vals=3)
+        self.fill_graph('revenue_last_week', "%m/%d", revenue_last_week_query)
+        self.fill_graph('revenue_last_month', "%b", revenue_last_month_query, days=False)
         self.write(self.graph_data)
 
-    def fill_graph(self, graph_name,  formatted_date, query, days=True, two_y=False):
+    def fill_graph(self, graph_name,  formatted_date, query, days=True, y_vals=1):
         today = datetime.datetime.today()
         for num in range(0, 7):
             if days:
@@ -131,8 +121,13 @@ class GraphHandler(tornado.web.RequestHandler):
                 next_day = day + relativedelta(months= 1, day=1)
             db_query = query.format(day.strftime("%Y-%m-%d"), next_day.strftime("%Y-%m-%d"))
             response = query_database_all_responses(db_query)[0]
-            if two_y:
-                self.graph_data['graphs'][graph_name]['data'].append({'x': day.strftime("%m/%d"),
+            if y_vals == 3:
+                self.graph_data['graphs'][graph_name]['data'].append({'x': day.strftime(formatted_date),
+                                                                      'y1': response[0],
+                                                                      'y2': response[1],
+                                                                      'y3': response[2]})
+            elif y_vals == 2:
+                self.graph_data['graphs'][graph_name]['data'].append({'x': day.strftime(formatted_date),
                                                                       'y1': response[0],
                                                                       'y2': response[1]})
             else:
@@ -145,7 +140,7 @@ class PoliciesHandler(tornado.web.RequestHandler):
         total_policies_query = 'SELECT COUNT(id) FROM "Insurance"."insurance_purchases"' \
                                'WHERE is_canceled = false'
         most_recent_policy_query = 'SELECT date_added FROM "Insurance"."insurance_purchases" ORDER BY date_added DESC'
-        self.write({'total_policies': query_database_single_response(total_policies_query),
+        self.write({'total_policies': format_number(query_database_single_response(total_policies_query)),
                     'most_recently_added': query_database_single_response(most_recent_policy_query).strftime("%H:%M")})
 
 
@@ -156,8 +151,8 @@ class RevenueHandler(tornado.web.RequestHandler):
         most_recent_policy_query = 'SELECT date_added FROM "Insurance"."insurance_purchases" ORDER BY date_added DESC'
         today = datetime.datetime.today()
         revenue_today = total_revenue_query + ' WHERE date_added > \'{}\''.format(today.strftime("%Y-%m-%d"))
-        self.write({'total_revenue': currency + str(round(query_database_single_response(total_revenue_query))),
-                    'revenue_today': currency + str(round(query_database_single_response(revenue_today))),
+        self.write({'total_revenue': currency + format_number(query_database_single_response(total_revenue_query)),
+                    'revenue_today': currency + format_number(query_database_single_response(revenue_today)),
                     'most_recently_added': query_database_single_response(most_recent_policy_query).strftime("%H:%M")})
 
 
@@ -181,7 +176,7 @@ class ApiHandler(tornado.web.RequestHandler):
         #                 json={"lat": lat, "lng": lng, "radius": radius, "request_type": "point_safety"}).content)['data']))
 
     def test_database(self, dictionary):
-        example_query = 'SELECT id FROM "Insurance"."insurance_policies"'
+        example_query = 'SELECT id FROM "Insurance"."insurance_policies" LIMIT 1'
         start_time = time.time()
         response = query_database_single_response(example_query)
         end_time = time.time()
