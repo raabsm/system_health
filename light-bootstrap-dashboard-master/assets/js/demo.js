@@ -6,14 +6,6 @@ $().ready(function() {
     var revenue_today;
     var total_revenue;
 
-//    function format_time(num) {
-//        var zero = "0";
-//        if (num < 10) {
-//            return zero.concat(num.toString());
-//        } else {
-//            return num.toString();
-//        }
-//    };
     function profiles() {
         $.getJSON("/profiles", function(result){
 
@@ -26,11 +18,11 @@ $().ready(function() {
             if (result['num_profiles'] != user_count) {
                 user_count = result['total_profiles'];
                 document.getElementById("user_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
-                + " No change in policy count since "+ result['most_recently_added'] + "</p>";
+                + " No change in profile count since "+ result['most_recently_added'] + "</p>";
             }
             else {
                 document.getElementById("user_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
-                + " No change in policy count since "+ result['most_recently_added'] + "</p>";
+                + " No change in profile count since "+ result['most_recently_added'] + "</p>";
             }
         });
     };
@@ -44,11 +36,11 @@ $().ready(function() {
             if (result['total_policies'] != policy_count) {
                 policy_count = result['total_policies'];
                 document.getElementById("policy_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
-                + " No change in revenue since result['most_recently_added'] </p>";
+                + " No change in policy count since result['most_recently_added'] </p>";
             }
             else {
                 document.getElementById("policy_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
-                + " No change in revenue since result['most_recently_added']</p>";
+                + " No change in policy count since result['most_recently_added']</p>";
             }
         });
     };
@@ -63,11 +55,11 @@ $().ready(function() {
              if (result['total_revenue'] != total_revenue) {
                 total_revenue = result['total_revenue'];
                 document.getElementById("revenue_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
-                + " No change in user count since result['most_recently_added'] </p>";
+                + " No change in revenue since result['most_recently_added'] </p>";
             }
             else {
                 document.getElementById("revenue_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
-                + " No change in user count since result['most_recently_added']</p>";
+                + " No change in revenue since result['most_recently_added']</p>";
             }
         });
     };
