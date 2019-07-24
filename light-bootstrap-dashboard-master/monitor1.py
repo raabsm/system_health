@@ -79,7 +79,7 @@ class ProfilesHandler(tornado.web.RequestHandler):
         profiles_last_week_query = total_profiles_query \
                              + ' WHERE date_added > \'{0}\''.format(last_week.strftime("%Y-%m-%d"))
         data = {'total_profiles': query_database_single_response(total_profiles_query),
-                'most_recently_added': query_database_single_response(last_profile_added).strftime("%H : %M"),
+                'most_recently_added': query_database_single_response(last_profile_added).strftime("%H:%M"),
                 'total_last_week': query_database_single_response(profiles_last_week_query)}
         self.write(data)
 
@@ -105,7 +105,7 @@ class GraphHandler(tornado.web.RequestHandler):
                                                                  },
                                                         'data': []
                                                         }
-                                      }
+                                    }
                            }
         profiles_last_week_query = 'SELECT count(profiles.id), count(addresses.address1) ' \
                                   'FROM "User"."profiles" profiles ' \
