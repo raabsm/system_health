@@ -79,27 +79,27 @@ class ProfilesHandler(tornado.web.RequestHandler):
         profiles_last_week_query = total_profiles_query \
                              + ' WHERE date_added > \'{0}\''.format(last_week.strftime("%Y-%m-%d"))
         data = {'total_profiles': query_database_single_response(total_profiles_query),
-                'most_recently_added': query_database_single_response(last_profile_added).strftime("%H:%M"),
+                'most_recently_added': query_database_single_response(last_profile_added).strftime("%H-%M"),
                 'total_last_week': query_database_single_response(profiles_last_week_query)}
         self.write(data)
 
 
 class GraphHandler(tornado.web.RequestHandler):
     def get(self):
-        self.graph_data = {'graphs': {'profiles_last_week': {'title': 'Profiles Last Week',
+        self.graph_data = {'graphs': {'profiles_last_week': {'title': 'Weekly Profile Increase',
                                                         'key': {'x': 'Date',
                                                                 'y1': 'Registered',
                                                                 'y2': 'Filled Profile'
                                                                 },
                                                         'data': []
                                                             },
-                                    'revenue_last_week': {'title': 'Revenue Last Week',
+                                    'revenue_last_week': {'title': 'Daily Revenue',
                                                        'key': {'x': 'Date',
                                                                'y1': 'Revenue'
                                                                },
                                                        'data': []
                                                        },
-                                    'revenue_last_month': {'title': 'Revenue Last Month',
+                                    'revenue_last_month': {'title': 'Monthly Revenue',
                                                         'key': {'x': 'Month',
                                                                  'y1': 'Revenue'
                                                                  },

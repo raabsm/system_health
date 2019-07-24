@@ -26,11 +26,11 @@ $().ready(function() {
             if (result['num_profiles'] != user_count) {
                 user_count = result['total_profiles'];
                 document.getElementById("user_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
-                + " No change in user count since "+ result['most_recently_added'] + "</p>";
+                + " No change in policy count since "+ result['most_recently_added'] + "</p>";
             }
             else {
                 document.getElementById("user_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
-                + " No change in user count since "+ result['most_recently_added'] + "</p>";
+                + " No change in policy count since "+ result['most_recently_added'] + "</p>";
             }
         });
     };
@@ -41,6 +41,15 @@ $().ready(function() {
             document.getElementById("num_policies").innerHTML =
             "<br><p style=\"color: #5743AF\">Policy count: <h1 style=\"color: #5743AF\">"
              + result['total_policies'] + "</h1></p>";
+            if (result['total_policies'] != policy_count) {
+                policy_count = result['total_policies'];
+                document.getElementById("policy_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
+                + " No change in revenue since result['most_recently_added'] </p>";
+            }
+            else {
+                document.getElementById("policy_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
+                + " No change in revenue since result['most_recently_added']</p>";
+            }
         });
     };
 
@@ -51,6 +60,15 @@ $().ready(function() {
             "<br><p style=\"color: #5743AF\">Total Revenue:<h1 style=\"color: #5743AF\">"
              + result['total_revenue'] + "</h1></p><p style=\"color: #5743AF\">Revenue today:"
              + "<h2 style=\"color: #5743AF\">" + result['revenue_today'] + "</h2></p>";
+             if (result['total_revenue'] != total_revenue) {
+                total_revenue = result['total_revenue'];
+                document.getElementById("revenue_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
+                + " No change in user count since result['most_recently_added'] </p>";
+            }
+            else {
+                document.getElementById("revenue_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
+                + " No change in user count since result['most_recently_added']</p>";
+            }
         });
     };
 
