@@ -1,6 +1,9 @@
 
 $().ready(function() {
 
+
+
+//=====================================================================================================================//
     var user_count;
     var policy_count;
     var revenue_today;
@@ -103,8 +106,11 @@ $().ready(function() {
                  "<div class=\"widget\" id=\"api\"><h3>" + apis[i]['name'] + "</h3><p>Response time:<br>"+ response_time + " seconds</p>" + sign +
                  "</div></div></div></div>";
             }
-            document.getElementById("ping").innerHTML = result;
+            var today = Date.now();
+            document.getElementById("ping").innerHTML = result + "<div class=\"text-center\">API Widgets updated a minute ago "
+            + today + "</div>";
         })};
+
     ping();
     setInterval(function() {
         ping();
@@ -298,7 +304,7 @@ demo = {
 
             var info = val['data'].reverse();
             var data_labels = [];
-            var data_series = [[], []];
+            var data_series = [[], [], []];
             var j;
 
             for (j = 0; j < info.length; j++) {
@@ -307,10 +313,12 @@ demo = {
                 if(info[j]["y2"]) {
                     data_series[1][j] = info[j]["y2"];
                 }
+                if(info[j]["y3"]) {
+                    data_series[2][j] = info[j]["y3"];
+                }
             }
 
             var data = {labels: data_labels, series: data_series};
-            console.log(data);
 
             var options = {
                 seriesBarDistance: 10,
@@ -332,16 +340,20 @@ demo = {
             ];
 
             var second_val = "";
-            console.log(val['key']);
+            var third_val = "";
             if('y2' in val['key']) {
                 second_val = "<i class=\"fa fa-circle text-danger\"></i>" + val['key']['y2'];
             }
+            if('y3' in val['key']) {
+                second_val = "<i class=\"fa fa-circle text-success\"></i>" + val['key']['y3'];
+            }
+
 
             var id = "chartActivity" + key;
             $("#bar-charts").append("<div class=\"col-md-6\"><div class=\"card \">" +
             "<div class=\"card-header \"><h4 class=\"card-title\">" + val['title'] +"</h4></div><div class=\"card-body \" id=\"chart\">"+
             "<div id=\"" + id + "\" class=\"ct-chart\"></div></div><br><div class=\"card-footer \">" +
-            "<i class=\"fa fa-circle text-info\"></i>" + val['key']['y1'] + second_val + "<hr>" +
+            "<i class=\"fa fa-circle text-info\"></i>" + val['key']['y1'] + second_val + third_val + "<hr>" +
             "<div class=\"stats\"><i class=\"fa fa-check\"></i> Data information certified</div>" +
             "</div></div></div>");
             id = "#" + id;
