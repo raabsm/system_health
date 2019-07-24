@@ -79,7 +79,7 @@ class ProfilesHandler(tornado.web.RequestHandler):
         profiles_last_week_query = total_profiles_query \
                              + ' WHERE date_added > \'{0}\''.format(last_week.strftime("%Y-%m-%d"))
         data = {'total_profiles': query_database_single_response(total_profiles_query),
-                'most_recently_added': query_database_single_response(last_profile_added).strftime("%H : %M"),
+                'most_recently_added': query_database_single_response(last_profile_added).strftime("%H:%M"),
                 'total_last_week': query_database_single_response(profiles_last_week_query)}
         self.write(data)
 
@@ -108,8 +108,8 @@ class GraphHandler(tornado.web.RequestHandler):
                                       }
                            }
         profiles_last_week_query = 'SELECT count(profiles.id), count(addresses.address1) ' \
-                                  'FROM "User"."profiles" profiles ' \
-                                  'INNER JOIN "User"."addresses" addresses ON (profiles.id = addresses.user_profile_id) ' \
+                                   'FROM "User"."profiles" profiles ' \
+                                   'INNER JOIN "User"."addresses" addresses ON (profiles.id = addresses.user_profile_id) ' \
                                   'WHERE profiles.date_added > \'{0}\' AND profiles.date_added < \'{1}\''
         revenue_last_week_query = 'SELECT SUM(final_price) FROM "Insurance"."insurance_purchases" purchases ' \
                                   'WHERE purchases.date_added > \'{0}\' AND purchases.date_added < \'{1}\''
@@ -129,7 +129,6 @@ class GraphHandler(tornado.web.RequestHandler):
             else:
                 day = (today - relativedelta(months=num + 1, day=1))
                 next_day = day + relativedelta(months= 1, day=1)
-                print(day.strftime("%Y-%m-%d"), next_day.strftime("%Y-%m-%d"))
             db_query = query.format(day.strftime("%Y-%m-%d"), next_day.strftime("%Y-%m-%d"))
             response = query_database_all_responses(db_query)[0]
             if two_y:
@@ -145,17 +144,21 @@ class PoliciesHandler(tornado.web.RequestHandler):
     def get(self):
         total_policies_query = 'SELECT COUNT(id) FROM "Insurance"."insurance_purchases"' \
                                'WHERE is_canceled = false'
-        self.write({'total_policies': query_database_single_response(total_policies_query)})
+        most_recent_policy_query = 'SELECT date_added FROM "Insurance"."insurance_purchases" ORDER BY date_added DESC'
+        self.write({'total_policies': query_database_single_response(total_policies_query),
+                    'most_recently_added': query_database_single_response(most_recent_policy_query).strftime("%H:%M")})
 
 
 class RevenueHandler(tornado.web.RequestHandler):
     def get(self):
         currency = "$"
         total_revenue_query = 'SELECT SUM(final_price) FROM "Insurance"."insurance_purchases"'
+        most_recent_policy_query = 'SELECT date_added FROM "Insurance"."insurance_purchases" ORDER BY date_added DESC'
         today = datetime.datetime.today()
         revenue_today = total_revenue_query + ' WHERE date_added > \'{}\''.format(today.strftime("%Y-%m-%d"))
         self.write({'total_revenue': currency + str(round(query_database_single_response(total_revenue_query))),
-                    'revenue_today': currency + str(round(query_database_single_response(revenue_today)))})
+                    'revenue_today': currency + str(round(query_database_single_response(revenue_today))),
+                    'most_recently_added': query_database_single_response(most_recent_policy_query).strftime("%H:%M")})
 
 
 class ApiHandler(tornado.web.RequestHandler):
@@ -163,8 +166,10 @@ class ApiHandler(tornado.web.RequestHandler):
         data = {'api':[]}
         hazard_response = self.query_hazard_service(40.791859, -84.434, 30, 'http://hazards.skywatch.ai')
         skywatch_response = self.query_skywatch_api()
+        airmap_response = self.query_airmap()
         add_api_data(data, 'hazard_api', hazard_response)
         add_api_data(data, 'skywatch_api', skywatch_response)
+        add_api_data(data, 'airmap_api', airmap_response)
         self.test_database(data)
         self.write(data)
 
@@ -186,10 +191,18 @@ class ApiHandler(tornado.web.RequestHandler):
         else:
             active = False
             response_time = 0
-        dictionary['api'].append({'name': 'DataBase', 'info': {'active': active,
+        dictionary['api'].append({'name': 'Database', 'info': {'active': active,
                                   'response_time': str(response_time)}})
         return dictionary
 
+    def query_airmap(self):
+        url = "https://api.airmap.com/aircraft/v2/manufacturer"
+        headers = {
+            'accept': "application/json",
+            'x-api-key': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVkZW50aWFsX2lkIjoiY3JlZGVudGlhbHxLYTNrZ1B4RktReW1kZ2h5N3F2cEFzTUFKYTVnIiwiYXBwbGljYXRpb25faWQiOiJhcHBsaWNhdGlvbnxhWVlhNG1kSGQ0QmdPRkdwTGdiT0ZrTjAwWFAiLCJvcmdhbml6YXRpb25faWQiOiJkZXZlbG9wZXJ8UHlNTHkzWUZnM2IyTUtpeUVsYldic1FnbUw0RCIsImlhdCI6MTUxOTU4MTQ4OX0.rnz4zjKkyO9dzDW5S8bhkIOjwRPLuoUaXT0kqNcHgzo"
+        }
+        response = requests.request("GET", url, headers=headers)
+        return response
 
     def query_skywatch_api(self):
         skywatch_api = 'http://api.us-dev.skywatch.ai/api/insurances/offers'
