@@ -36,11 +36,11 @@ $().ready(function() {
             if (result['total_policies'] != policy_count) {
                 policy_count = result['total_policies'];
                 document.getElementById("policy_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
-                + " No change in policy count since result['most_recently_added'] </p>";
+                + " No change in policy count since " + result['most_recently_added'] + "</p>";
             }
             else {
                 document.getElementById("policy_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
-                + " No change in policy count since result['most_recently_added']</p>";
+                + " No change in policy count since " + result['most_recently_added'] + "</p>";
             }
         });
     };
@@ -55,11 +55,11 @@ $().ready(function() {
              if (result['total_revenue'] != total_revenue) {
                 total_revenue = result['total_revenue'];
                 document.getElementById("revenue_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
-                + " No change in revenue since result['most_recently_added'] </p>";
+                + " No change in revenue since " + result['most_recently_added'] + "</p>";
             }
             else {
                 document.getElementById("revenue_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
-                + " No change in revenue since result['most_recently_added']</p>";
+                + " No change in revenue since " + result['most_recently_added']+ "</p>";
             }
         });
     };
