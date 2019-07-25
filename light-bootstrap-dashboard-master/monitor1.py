@@ -12,7 +12,6 @@ import DBConnection
 import time
 import pytz
 
-
 tornado.options.define('port', default=8889, help='port to listen on')
 
 
@@ -49,7 +48,7 @@ def add_api_data(dictionary, api_name, response):
     response_time = str(response.elapsed.total_seconds())
     # print(type(response.elapsed))
     dictionary['api'].append({'name': api_name, 'info': {'active': active,
-                             'response_time': response_time}})
+                                                         'response_time': response_time}})
     return dictionary
 
 
@@ -74,7 +73,7 @@ class ProfilesHandler(tornado.web.RequestHandler):
         today = datetime.datetime.today()
         last_week = (today - datetime.timedelta(days=7))
         profiles_last_week_query = total_profiles_query \
-                             + ' WHERE date_added > \'{0}\''.format(last_week.strftime("%Y-%m-%d"))
+                                   + ' WHERE date_added > \'{0}\''.format(last_week.strftime("%Y-%m-%d"))
         data = {'total_profiles': format_number(query_database_single_response(total_profiles_query)),
                 'most_recently_added': format_time(query_database_single_response(last_profile_added)),
                 'total_last_week': format_number(query_database_single_response(profiles_last_week_query))}
@@ -84,26 +83,26 @@ class ProfilesHandler(tornado.web.RequestHandler):
 class GraphHandler(tornado.web.RequestHandler):
     def get(self):
         self.graph_data = {'graphs': {'profiles_last_week': {'title': 'Weekly Profile Increase',
-                                                        'key': {'x': 'Date',
-                                                                'y1': 'Registered',
-                                                                'y2': 'Filled address info',
-                                                                'y3': 'Filled card info'
-                                                                },
-                                                        'data': []
+                                                             'key': {'x': 'Date',
+                                                                     'y1': 'Registered',
+                                                                     'y2': 'Filled address info',
+                                                                     'y3': 'Filled card info'
+                                                                     },
+                                                             'data': []
+                                                             },
+                                      'revenue_last_week': {'title': 'Daily Revenue',
+                                                            'key': {'x': 'Date',
+                                                                    'y1': 'Revenue'
+                                                                    },
+                                                            'data': []
                                                             },
-                                    'revenue_last_week': {'title': 'Daily Revenue',
-                                                       'key': {'x': 'Date',
-                                                               'y1': 'Revenue'
-                                                               },
-                                                       'data': []
-                                                       },
-                                    'revenue_last_month': {'title': 'Monthly Revenue',
-                                                        'key': {'x': 'Month',
-                                                                 'y1': 'Revenue'
-                                                                 },
-                                                        'data': []
-                                                        }
-                                    }
+                                      'revenue_last_month': {'title': 'Monthly Revenue',
+                                                             'key': {'x': 'Month',
+                                                                     'y1': 'Revenue'
+                                                                     },
+                                                             'data': []
+                                                             }
+                                      }
                            }
         profiles_last_week_query = 'SELECT count(profiles.id), count(addresses.address1), count(profiles.stripe_customer_id)' \
                                    'FROM "User"."profiles" profiles ' \
@@ -118,15 +117,15 @@ class GraphHandler(tornado.web.RequestHandler):
         self.fill_graph('revenue_last_month', "%b", revenue_last_month_query, days=False)
         self.write(self.graph_data)
 
-    def fill_graph(self, graph_name,  formatted_date, query, days=True, y_vals=1):
+    def fill_graph(self, graph_name, formatted_date, query, days=True, y_vals=1):
         today = datetime.datetime.today()
         for num in range(0, 7):
             if days:
-                day = (today - relativedelta(days=num+1))
+                day = (today - relativedelta(days=num + 1))
                 next_day = day + datetime.timedelta(days=1)
             else:
                 day = (today - relativedelta(months=num + 1, day=1))
-                next_day = day + relativedelta(months= 1, day=1)
+                next_day = day + relativedelta(months=1, day=1)
             db_query = query.format(day.strftime("%Y-%m-%d"), next_day.strftime("%Y-%m-%d"))
             response = query_database_all_responses(db_query)[0]
             if y_vals == 3:
@@ -166,7 +165,7 @@ class RevenueHandler(tornado.web.RequestHandler):
 
 class ApiHandler(tornado.web.RequestHandler):
     def get(self):
-        data = {'api':[]}
+        data = {'api': []}
         hazard_response = self.query_hazard_service(40.791859, -84.434, 30, 'http://hazards.skywatch.ai')
         skywatch_response = self.query_skywatch_api()
         airmap_response = self.query_airmap()
@@ -178,7 +177,7 @@ class ApiHandler(tornado.web.RequestHandler):
 
     def query_hazard_service(self, lat, lng, radius, url):
         response = requests.post(url + "/sfa_handler_safe",
-                        json={"lat": lat, "lng": lng, "radius": radius, "request_type": "point_safety"})
+                                 json={"lat": lat, "lng": lng, "radius": radius, "request_type": "point_safety"})
         return response
         # return zlib.decompress(pybase64.standard_b64decode(json.loads(requests.post(url + "/sfa_handler_safe",
         #                 json={"lat": lat, "lng": lng, "radius": radius, "request_type": "point_safety"}).content)['data']))
@@ -190,12 +189,12 @@ class ApiHandler(tornado.web.RequestHandler):
         end_time = time.time()
         if response is not None:
             active = True
-            response_time = round(end_time-start_time, 4)
+            response_time = round(end_time - start_time, 4)
         else:
             active = False
             response_time = 0
         dictionary['api'].append({'name': 'Database', 'info': {'active': active,
-                                  'response_time': str(response_time)}})
+                                                               'response_time': str(response_time)}})
         return dictionary
 
     def query_airmap(self):
@@ -241,7 +240,7 @@ class ApiHandler(tornado.web.RequestHandler):
                     ]
                 }
             },
-            "start_time": 8563885267000
+            "start_time": 96510964051541
         }
         response = requests.post(skywatch_api, json=data_to_input)
         return response

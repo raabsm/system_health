@@ -14,7 +14,7 @@ $().ready(function() {
 
             document.getElementById("num_users").innerHTML =
             "<br><p style=\"color: #5743AF\">Total User Count:<h1 style=\"color: #5743AF\">"
-             + result['total_profiles'] + "</h1></p><p style=\"color: #5743AF\">Joined in last week:"
+             + result['total_profiles'] + "</h1></p><p style=\"color: #5743AF\">Joined in last 7 days:"
              + "<h2 style=\"color: #5743AF\">" + result['total_last_week'] + "</h2></p>";
 
 
@@ -34,7 +34,7 @@ $().ready(function() {
         $.getJSON("/policies", function(result){
 
             document.getElementById("num_policies").innerHTML =
-            "<br><p style=\"color: #5743AF\">Policy count: <h1 style=\"color: #5743AF\">"
+            "<br><p style=\"color: #5743AF\">Total policy count: <h1 style=\"color: #5743AF\">"
              + result['total_policies'] + "</h1></p>";
             if (result['total_policies'] != policy_count) {
                 policy_count = result['total_policies'];
@@ -107,7 +107,14 @@ $().ready(function() {
                  "</div></div></div></div>";
             }
             var current_datetime = new Date();
-            var today_string = current_datetime.getHours() + ":" + current_datetime.getMinutes() + ":" + current_datetime.getSeconds()
+            var hh = current_datetime.getHours()
+            var mm = current_datetime.getMinutes()
+            var ss = current_datetime.getSeconds()
+            if (hh < 10) {hh = "0"+hh;}
+            if (mm < 10) {mm = "0"+mm;}
+            if (ss < 10) {ss = "0"+ss;}
+            var today_string = hh+":"+mm+":"+ss;
+
             document.getElementById("ping").innerHTML = result + "<div class=\"text-center\">API Widgets last updated "
             + today_string + "</div>";
         })};
