@@ -10,6 +10,7 @@ import DBConnection
 # import zlib
 # import pybase64
 import time
+import pytz
 
 
 tornado.options.define('port', default=8889, help='port to listen on')
@@ -17,6 +18,13 @@ tornado.options.define('port', default=8889, help='port to listen on')
 
 def format_number(entry):
     return "{:,}".format(round(entry))
+
+
+def format_time(time):
+    utc_time = pytz.utc.localize(time)
+    israel_timezone = pytz.timezone('Israel')
+    israel = utc_time.astimezone(israel_timezone)
+    return israel.strftime("%H:%M")
 
 
 def query_database_single_response(query):
@@ -68,7 +76,7 @@ class ProfilesHandler(tornado.web.RequestHandler):
         profiles_last_week_query = total_profiles_query \
                              + ' WHERE date_added > \'{0}\''.format(last_week.strftime("%Y-%m-%d"))
         data = {'total_profiles': format_number(query_database_single_response(total_profiles_query)),
-                'most_recently_added': query_database_single_response(last_profile_added).strftime("%H:%M"),
+                'most_recently_added': format_time(query_database_single_response(last_profile_added)),
                 'total_last_week': format_number(query_database_single_response(profiles_last_week_query))}
         self.write(data)
 
@@ -139,9 +147,9 @@ class PoliciesHandler(tornado.web.RequestHandler):
     def get(self):
         total_policies_query = 'SELECT COUNT(id) FROM "Insurance"."insurance_purchases"' \
                                'WHERE is_canceled = false'
-        most_recent_policy_query = 'SELECT date_added FROM "Insurance"."insurance_purchases" ORDER BY date_added DESC'
+        most_recent_policy_query = 'SELECT date_added FROM "Insurance"."insurance_purchases" ORDER BY date_added DESC LIMIT 1'
         self.write({'total_policies': format_number(query_database_single_response(total_policies_query)),
-                    'most_recently_added': query_database_single_response(most_recent_policy_query).strftime("%H:%M")})
+                    'most_recently_added': format_time(query_database_single_response(most_recent_policy_query))})
 
 
 class RevenueHandler(tornado.web.RequestHandler):
@@ -153,7 +161,7 @@ class RevenueHandler(tornado.web.RequestHandler):
         revenue_today = total_revenue_query + ' WHERE date_added > \'{}\''.format(today.strftime("%Y-%m-%d"))
         self.write({'total_revenue': currency + format_number(query_database_single_response(total_revenue_query)),
                     'revenue_today': currency + format_number(query_database_single_response(revenue_today)),
-                    'most_recently_added': query_database_single_response(most_recent_policy_query).strftime("%H:%M")})
+                    'most_recently_added': format_time(query_database_single_response(most_recent_policy_query))})
 
 
 class ApiHandler(tornado.web.RequestHandler):
