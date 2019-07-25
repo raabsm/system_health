@@ -9,61 +9,54 @@ $().ready(function() {
     var revenue_today;
     var total_revenue;
 
+    function add_timestamp(element, timestamp){
+        var to_insert = "<div <p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
+                + " No change in count since "+ timestamp + "</p> </div>";
+        element.innerHTML = to_insert;
+    }
+
+    function fill_counter_widget(element, counter, sub_counter, title, sub_title){
+        var to_insert = "<br><p style=\"color: #5743AF\">" + title + "<h1 style=\"color: #5743AF\">"
+             + counter + "</h1></p>";
+        if(sub_counter != null){
+            to_insert += "<p style=\"color: #5743AF\">" + sub_title
+             + "<h2 style=\"color: #5743AF\">" + sub_counter + "</h2></p>";
+        }
+        element.innerHTML = to_insert;
+    }
+
     function profiles() {
         $.getJSON("/profiles", function(result){
-
-            document.getElementById("num_users").innerHTML =
-            "<br><p style=\"color: #5743AF\">Total User Count:<h1 style=\"color: #5743AF\">"
-             + result['total_profiles'] + "</h1></p><p style=\"color: #5743AF\">Joined in last 7 days:"
-             + "<h2 style=\"color: #5743AF\">" + result['total_last_week'] + "</h2></p>";
-
-
-            if (result['num_profiles'] != user_count) {
-                user_count = result['total_profiles'];
-                document.getElementById("user_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
-                + " No change in profile count since "+ result['most_recently_added'] + "</p>";
-            }
-            else {
-                document.getElementById("user_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
-                + " No change in profile count since "+ result['most_recently_added'] + "</p>";
-            }
+            fill_counter_widget(document.getElementById("num_users"),
+                                result['total_profiles'],
+                                result['total_last_week'],
+                                "Total User Count",
+                                "Joined in last 7 days:");
+            add_timestamp(document.getElementById("user_stats"), result['most_recently_added']);
         });
     };
 
     function policies() {
         $.getJSON("/policies", function(result){
+            fill_counter_widget(document.getElementById("num_policies"),
+                                result['total_policies'],
+                                null,
+                                "Total Policy Count:",
+                                null);
 
-            document.getElementById("num_policies").innerHTML =
-            "<br><p style=\"color: #5743AF\">Total policy count: <h1 style=\"color: #5743AF\">"
-             + result['total_policies'] + "</h1></p>";
-            if (result['total_policies'] != policy_count) {
-                policy_count = result['total_policies'];
-                document.getElementById("policy_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
-                + " No change in policy count since " + result['most_recently_added'] + "</p>";
-            }
-            else {
-                document.getElementById("policy_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
-                + " No change in policy count since " + result['most_recently_added'] + "</p>";
-            }
+            add_timestamp(document.getElementById("policy_stats"), result['most_recently_added']);
         });
     };
 
     function revenue() {
         $.getJSON("/revenue", function(result){
+             fill_counter_widget(document.getElementById("revenue"),
+                                result['total_revenue'],
+                                result['revenue_today'],
+                                "Total Revenue:",
+                                "Revenue Today:");
 
-            document.getElementById("revenue").innerHTML =
-            "<br><p style=\"color: #5743AF\">Total Revenue:<h1 style=\"color: #5743AF\">"
-             + result['total_revenue'] + "</h1></p><p style=\"color: #5743AF\">Revenue today:"
-             + "<h2 style=\"color: #5743AF\">" + result['revenue_today'] + "</h2></p>";
-             if (result['total_revenue'] != total_revenue) {
-                total_revenue = result['total_revenue'];
-                document.getElementById("revenue_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
-                + " No change in revenue since " + result['most_recently_added'] + "</p>";
-            }
-            else {
-                document.getElementById("revenue_stats").innerHTML = "<p style=\"color: #5743AF\"><i class=\"fa fa-history\"></i>"
-                + " No change in revenue since " + result['most_recently_added']+ "</p>";
-            }
+            add_timestamp(document.getElementById("revenue_stats"), result['most_recently_added']);
         });
     };
 
