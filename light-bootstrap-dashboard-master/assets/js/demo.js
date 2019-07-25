@@ -106,9 +106,10 @@ $().ready(function() {
                  "<div class=\"widget\" id=\"api\"><h3>" + apis[i]['name'] + "</h3><p>Response time:<br>"+ response_time + " seconds</p>" + sign +
                  "</div></div></div></div>";
             }
-            var today = Date.now();
-            document.getElementById("ping").innerHTML = result + "<div class=\"text-center\">API Widgets updated a minute ago "
-            + today + "</div>";
+            var current_datetime = new Date();
+            var today_string = current_datetime.getHours() + ":" + current_datetime.getMinutes() + ":" + current_datetime.getSeconds()
+            document.getElementById("ping").innerHTML = result + "<div class=\"text-center\">API Widgets last updated "
+            + today_string + "</div>";
         })};
 
     ping();
@@ -345,7 +346,7 @@ demo = {
                 second_val = "<i class=\"fa fa-circle text-danger\"></i>" + val['key']['y2'];
             }
             if('y3' in val['key']) {
-                second_val = "<i class=\"fa fa-circle text-success\"></i>" + val['key']['y3'];
+                third_val = "<i class=\"fa fa-circle text-warning\"></i>" + val['key']['y3'];
             }
 
 
@@ -359,7 +360,6 @@ demo = {
             id = "#" + id;
             var chartActivity = Chartist.Bar(id, data, options, responsiveOptions);
             }
-
 
             var dataPreferences = {
                 series: [
