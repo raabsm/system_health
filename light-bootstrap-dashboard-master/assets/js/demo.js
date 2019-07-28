@@ -311,10 +311,10 @@ demo = {
             for (j = 0; j < info.length; j++) {
                 data_labels[j] = info[j]["x"];
                 data_series[0][j] = info[j]["y1"];
-                if(info[j]["y2"]) {
+                if("y2" in info[j]) {
                     data_series[1][j] = info[j]["y2"];
                 }
-                if(info[j]["y3"]) {
+                if("y3" in info[y]) {
                     data_series[2][j] = info[j]["y3"];
                 }
             }
