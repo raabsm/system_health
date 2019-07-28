@@ -10,24 +10,20 @@ import DBConnection
 # import zlib
 # import pybase64
 import time
-
+import pytz
 
 tornado.options.define('port', default=8889, help='port to listen on')
 
 
-# return an object containing info for each widget
-    # def widget_properties(name, url):
-    #     try:
-    #         string = []
-    #         request = requests.get(url)
-    #         r = json.loads(request.text)
-    #         responsetime = "Response time: " + str(round(request.elapsed.total_seconds(), 2)) + "s"
-    #         stamp = "Query: " + str(datetime.datetime.now())
-    #         # string.extend(widget_specs(name, r, datetime.datetime.now(), round(request.elapsed.total_seconds(), 2)))
-    #         string.extend((responsetime, stamp))
-    #         return {name: {url: string}}
-    #     except:
-    #         print("Couldn't get widget properties")
+def format_number(entry):
+    return "{:,}".format(round(entry))
+
+
+def format_time(time):
+    utc_time = pytz.utc.localize(time)
+    israel_timezone = pytz.timezone('Israel')
+    israel = utc_time.astimezone(israel_timezone)
+    return israel.strftime("%H:%M")
 
 
 def query_database_single_response(query):
@@ -52,7 +48,7 @@ def add_api_data(dictionary, api_name, response):
     response_time = str(response.elapsed.total_seconds())
     # print(type(response.elapsed))
     dictionary['api'].append({'name': api_name, 'info': {'active': active,
-                             'response_time': response_time}})
+                                                         'response_time': response_time}})
     return dictionary
 
 
@@ -77,62 +73,68 @@ class ProfilesHandler(tornado.web.RequestHandler):
         today = datetime.datetime.today()
         last_week = (today - datetime.timedelta(days=7))
         profiles_last_week_query = total_profiles_query \
-                             + ' WHERE date_added > \'{0}\''.format(last_week.strftime("%Y-%m-%d"))
-        data = {'total_profiles': query_database_single_response(total_profiles_query),
-                'most_recently_added': query_database_single_response(last_profile_added).strftime("%H:%M"),
-                'total_last_week': query_database_single_response(profiles_last_week_query)}
+                                   + ' WHERE date_added > \'{0}\''.format(last_week.strftime("%Y-%m-%d"))
+        data = {'total_profiles': format_number(query_database_single_response(total_profiles_query)),
+                'most_recently_added': format_time(query_database_single_response(last_profile_added)),
+                'total_last_week': format_number(query_database_single_response(profiles_last_week_query))}
         self.write(data)
 
 
 class GraphHandler(tornado.web.RequestHandler):
     def get(self):
         self.graph_data = {'graphs': {'profiles_last_week': {'title': 'Weekly Profile Increase',
-                                                        'key': {'x': 'Date',
-                                                                'y1': 'Registered',
-                                                                'y2': 'Filled Profile'
-                                                                },
-                                                        'data': []
+                                                             'key': {'x': 'Date',
+                                                                     'y1': 'Registered',
+                                                                     'y2': 'Filled address info',
+                                                                     'y3': 'Filled card info'
+                                                                     },
+                                                             'data': []
+                                                             },
+                                      'revenue_last_week': {'title': 'Daily Revenue',
+                                                            'key': {'x': 'Date',
+                                                                    'y1': 'Revenue'
+                                                                    },
+                                                            'data': []
                                                             },
-                                    'revenue_last_week': {'title': 'Daily Revenue',
-                                                       'key': {'x': 'Date',
-                                                               'y1': 'Revenue'
-                                                               },
-                                                       'data': []
-                                                       },
-                                    'revenue_last_month': {'title': 'Monthly Revenue',
-                                                        'key': {'x': 'Month',
-                                                                 'y1': 'Revenue'
-                                                                 },
-                                                        'data': []
-                                                        }
-                                    }
+                                      'revenue_last_month': {'title': 'Monthly Revenue',
+                                                             'key': {'x': 'Month',
+                                                                     'y1': 'Revenue'
+                                                                     },
+                                                             'data': []
+                                                             }
+                                      }
                            }
-        profiles_last_week_query = 'SELECT count(profiles.id), count(addresses.address1) ' \
+        profiles_last_week_query = 'SELECT count(profiles.id), count(addresses.address1), count(profiles.stripe_customer_id)' \
                                    'FROM "User"."profiles" profiles ' \
                                    'INNER JOIN "User"."addresses" addresses ON (profiles.id = addresses.user_profile_id) ' \
-                                  'WHERE profiles.date_added > \'{0}\' AND profiles.date_added < \'{1}\''
+                                   'WHERE profiles.date_added > \'{0}\' AND profiles.date_added < \'{1}\''
         revenue_last_week_query = 'SELECT SUM(final_price) FROM "Insurance"."insurance_purchases" purchases ' \
                                   'WHERE purchases.date_added > \'{0}\' AND purchases.date_added < \'{1}\''
         revenue_last_month_query = revenue_last_week_query
 
-        self.fill_graph('profiles_last_week', "%m/%d", profiles_last_week_query, two_y=True)
-        self.fill_graph('revenue_last_week', "%m/%d", revenue_last_week_query, two_y=False)
-        self.fill_graph('revenue_last_month', "%b", revenue_last_month_query, days=False, two_y=False)
+        self.fill_graph('profiles_last_week', "%m/%d", profiles_last_week_query, y_vals=3)
+        self.fill_graph('revenue_last_week', "%m/%d", revenue_last_week_query)
+        self.fill_graph('revenue_last_month', "%b", revenue_last_month_query, days=False)
         self.write(self.graph_data)
 
-    def fill_graph(self, graph_name,  formatted_date, query, days=True, two_y=False):
+    def fill_graph(self, graph_name, formatted_date, query, days=True, y_vals=1):
         today = datetime.datetime.today()
         for num in range(0, 7):
             if days:
-                day = (today - relativedelta(days=num+1))
+                day = (today - relativedelta(days=num + 1))
                 next_day = day + datetime.timedelta(days=1)
             else:
                 day = (today - relativedelta(months=num + 1, day=1))
-                next_day = day + relativedelta(months= 1, day=1)
+                next_day = day + relativedelta(months=1, day=1)
             db_query = query.format(day.strftime("%Y-%m-%d"), next_day.strftime("%Y-%m-%d"))
             response = query_database_all_responses(db_query)[0]
-            if two_y:
-                self.graph_data['graphs'][graph_name]['data'].append({'x': day.strftime("%m/%d"),
+            if y_vals == 3:
+                self.graph_data['graphs'][graph_name]['data'].append({'x': day.strftime(formatted_date),
+                                                                      'y1': response[0],
+                                                                      'y2': response[1],
+                                                                      'y3': response[2]})
+            elif y_vals == 2:
+                self.graph_data['graphs'][graph_name]['data'].append({'x': day.strftime(formatted_date),
                                                                       'y1': response[0],
                                                                       'y2': response[1]})
             else:
@@ -144,9 +146,9 @@ class PoliciesHandler(tornado.web.RequestHandler):
     def get(self):
         total_policies_query = 'SELECT COUNT(id) FROM "Insurance"."insurance_purchases"' \
                                'WHERE is_canceled = false'
-        most_recent_policy_query = 'SELECT date_added FROM "Insurance"."insurance_purchases" ORDER BY date_added DESC'
-        self.write({'total_policies': query_database_single_response(total_policies_query),
-                    'most_recently_added': query_database_single_response(most_recent_policy_query).strftime("%H:%M")})
+        most_recent_policy_query = 'SELECT date_added FROM "Insurance"."insurance_purchases" ORDER BY date_added DESC LIMIT 1'
+        self.write({'total_policies': format_number(query_database_single_response(total_policies_query)),
+                    'most_recently_added': format_time(query_database_single_response(most_recent_policy_query))})
 
 
 class RevenueHandler(tornado.web.RequestHandler):
@@ -156,14 +158,14 @@ class RevenueHandler(tornado.web.RequestHandler):
         most_recent_policy_query = 'SELECT date_added FROM "Insurance"."insurance_purchases" ORDER BY date_added DESC'
         today = datetime.datetime.today()
         revenue_today = total_revenue_query + ' WHERE date_added > \'{}\''.format(today.strftime("%Y-%m-%d"))
-        self.write({'total_revenue': currency + str(round(query_database_single_response(total_revenue_query))),
-                    'revenue_today': currency + str(round(query_database_single_response(revenue_today))),
-                    'most_recently_added': query_database_single_response(most_recent_policy_query).strftime("%H:%M")})
+        self.write({'total_revenue': currency + format_number(query_database_single_response(total_revenue_query)),
+                    'revenue_today': currency + format_number(query_database_single_response(revenue_today)),
+                    'most_recently_added': format_time(query_database_single_response(most_recent_policy_query))})
 
 
 class ApiHandler(tornado.web.RequestHandler):
     def get(self):
-        data = {'api':[]}
+        data = {'api': []}
         hazard_response = self.query_hazard_service(40.791859, -84.434, 30, 'http://hazards.skywatch.ai')
         skywatch_response = self.query_skywatch_api()
         airmap_response = self.query_airmap()
@@ -175,24 +177,24 @@ class ApiHandler(tornado.web.RequestHandler):
 
     def query_hazard_service(self, lat, lng, radius, url):
         response = requests.post(url + "/sfa_handler_safe",
-                        json={"lat": lat, "lng": lng, "radius": radius, "request_type": "point_safety"})
+                                 json={"lat": lat, "lng": lng, "radius": radius, "request_type": "point_safety"})
         return response
         # return zlib.decompress(pybase64.standard_b64decode(json.loads(requests.post(url + "/sfa_handler_safe",
         #                 json={"lat": lat, "lng": lng, "radius": radius, "request_type": "point_safety"}).content)['data']))
 
     def test_database(self, dictionary):
-        example_query = 'SELECT id FROM "Insurance"."insurance_policies"'
+        example_query = 'SELECT id FROM "Insurance"."insurance_policies" LIMIT 1'
         start_time = time.time()
         response = query_database_single_response(example_query)
         end_time = time.time()
         if response is not None:
             active = True
-            response_time = round(end_time-start_time, 4)
+            response_time = round(end_time - start_time, 4)
         else:
             active = False
             response_time = 0
         dictionary['api'].append({'name': 'Database', 'info': {'active': active,
-                                  'response_time': str(response_time)}})
+                                                               'response_time': str(response_time)}})
         return dictionary
 
     def query_airmap(self):
@@ -238,7 +240,7 @@ class ApiHandler(tornado.web.RequestHandler):
                     ]
                 }
             },
-            "start_time": 8563885267000
+            "start_time": 96510964051541
         }
         response = requests.post(skywatch_api, json=data_to_input)
         return response
