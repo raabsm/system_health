@@ -314,7 +314,7 @@ demo = {
                 if("y2" in info[j]) {
                     data_series[1][j] = info[j]["y2"];
                 }
-                if("y3" in info[y]) {
+                if("y3" in info[j]) {
                     data_series[2][j] = info[j]["y3"];
                 }
             }
