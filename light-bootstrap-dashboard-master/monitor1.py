@@ -11,6 +11,7 @@ import DBConnection
 # import pybase64
 import time
 import pytz
+import elasticlogs
 
 tornado.options.define('port', default=8889, help='port to listen on')
 
@@ -246,6 +247,12 @@ class ApiHandler(tornado.web.RequestHandler):
         return response
 
 
+class ErrorLogsHandler(tornado.web.RequestHandler):
+    def get(self):
+        count = elasticlogs.elastic_search()
+        self.write({"Error Count in last 24 hours": count})
+
+
 # launch url according to input path
 def application():
     try:
@@ -255,6 +262,7 @@ def application():
                 (r"/revenue", RevenueHandler),
                 (r"/api", ApiHandler),
                 (r"/graphs", GraphHandler),
+                (r"/errors", ErrorLogsHandler),
                 (r"/assets/css/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/css"},),
                 (r"/assets/js/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/js"},),
                 (r"/assets/js/core/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/js/core"},),
