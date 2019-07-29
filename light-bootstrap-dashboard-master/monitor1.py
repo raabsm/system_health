@@ -260,8 +260,12 @@ class ApiHandler(tornado.web.RequestHandler):
 
 class ErrorLogsHandler(tornado.web.RequestHandler):
     def get(self):
-        count = elasticlogs.elastic_search()
-        self.write({"Error Count in last 24 hours": count})
+        count_last_day = elasticlogs.count_last_24_hours()
+        count_last_month = elasticlogs.count_last_month()
+        most_recent_logs = elasticlogs.most_recent_logs()
+        self.write({'count_last_day': count_last_day,
+                    'count_last_month': count_last_month,
+                    'most_recent_logs': most_recent_logs})
 
 
 # launch url according to input path
