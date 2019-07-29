@@ -83,7 +83,7 @@ class ProfilesHandler(tornado.web.RequestHandler):
 
 class GraphHandler(tornado.web.RequestHandler):
     def get(self):
-        self.graph_data = {'graphs': {'profiles_last_week': {'title': 'Weekly Profile Increase',
+        self.graph_data = {'graphs': {'profiles_last_week': {'title': 'Daily Profile Increase',
                                                              'key': {'x': 'Date',
                                                                      'y1': 'Registered',
                                                                      'y2': 'Filled address info',
@@ -102,6 +102,13 @@ class GraphHandler(tornado.web.RequestHandler):
                                                                      'y1': 'Revenue'
                                                                      },
                                                              'data': []
+                                                             },
+                                      'policies_last_week': {'title': 'Daily Policy Count',
+                                                             'key': {'x': 'Day',
+                                                                     'y1': 'On Demand',
+                                                                     'y2': 'Monthly'
+                                                                     },
+                                                             'data': []
                                                              }
                                       }
                            }
@@ -112,10 +119,14 @@ class GraphHandler(tornado.web.RequestHandler):
         revenue_last_week_query = 'SELECT SUM(final_price) FROM "Insurance"."insurance_purchases" purchases ' \
                                   'WHERE purchases.date_added > \'{0}\' AND purchases.date_added < \'{1}\''
         revenue_last_month_query = revenue_last_week_query
+        policies_last_week_query = 'SELECT count(id), (count(id) - count(covered_airspace)) ' \
+                                   'FROM "Insurance"."insurance_purchases" ' \
+                                   'WHERE date_added > \'{0}\' AND date_added < \'{1}\''
 
         self.fill_graph('profiles_last_week', "%m/%d", profiles_last_week_query, y_vals=3)
         self.fill_graph('revenue_last_week', "%m/%d", revenue_last_week_query)
         self.fill_graph('revenue_last_month', "%b", revenue_last_month_query, days=False)
+        self.fill_graph('policies_last_week', "%m/%d", policies_last_week_query, y_vals=2)
         self.write(self.graph_data)
 
     def fill_graph(self, graph_name, formatted_date, query, days=True, y_vals=1):
