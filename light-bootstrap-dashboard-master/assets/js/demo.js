@@ -60,14 +60,36 @@ $().ready(function() {
         });
     };
 
+    function errors() {
+        $.getJSON("/errors", function(result){
+             fill_counter_widget(document.getElementById("errors_24_hours"),
+                                result['count_last_day'],
+                                null,
+                                "Errors Last 24 Hours:",
+                                null);
+             fill_counter_widget(document.getElementById("errors_last_week"),
+                                result['count_last_week'],
+                                null,
+                                "Errors Last 7 Days:",
+                                null);
+             fill_counter_widget(document.getElementById("errors_last_month"),
+                                result['count_last_month'],
+                                null,
+                                "Errors Last Month:",
+                                null);
+        });
+    };
+
     profiles();
     policies();
     revenue();
+    errors();
 
     setInterval( function() {
         profiles();
         policies();
         revenue();
+        errors();
     }, 5000);
 
     setInterval(function() {
