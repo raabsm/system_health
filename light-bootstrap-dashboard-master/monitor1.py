@@ -17,6 +17,8 @@ tornado.options.define('port', default=8889, help='port to listen on')
 
 currency = "$"
 
+api_errors = []
+
 
 def format_number(entry):
     if entry is None:
@@ -51,7 +53,9 @@ def add_api_data(dictionary, api_name, response):
     else:
         active = True
     response_time = str(response.elapsed.total_seconds())
-    # print(type(response.elapsed))
+    if not active:
+        global api_errors
+        api_errors.append({api_name:datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S")})
     dictionary['api'].append({'name': api_name, 'info': {'active': active,
                                                          'response_time': response_time}})
     return dictionary
@@ -189,6 +193,7 @@ class ApiHandler(tornado.web.RequestHandler):
         add_api_data(data, 'skywatch_api', skywatch_response)
         add_api_data(data, 'airmap_api', airmap_response)
         self.test_database(data)
+        data['errors'] = api_errors
         self.write(data)
 
     def query_hazard_service(self, lat, lng, radius, url):
@@ -209,6 +214,9 @@ class ApiHandler(tornado.web.RequestHandler):
         else:
             active = False
             response_time = 0
+        if not active:
+            global api_errors
+            api_errors.append({'Database': datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S")})
         dictionary['api'].append({'name': 'Database', 'info': {'active': active,
                                                                'response_time': str(response_time)}})
         return dictionary
@@ -256,7 +264,7 @@ class ApiHandler(tornado.web.RequestHandler):
                     ]
                 }
             },
-            "start_time": 96510964051541
+           "start_time": 96510964051541
         }
         response = requests.post(skywatch_api, json=data_to_input)
         return response

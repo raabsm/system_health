@@ -146,9 +146,16 @@ $().ready(function() {
             if (ss < 10) {ss = "0"+ss;}
             var today_string = hh+":"+mm+":"+ss;
 
+            past_errors = "API Widgets last updated " + today_string
+
+            for (i = 0; i < data['errors'].length; i++) {
+                for(var key in data['errors'][i]){
+                    past_errors = past_errors + "<br>" + "Error: " + key + "--" + data['errors'][i][key]
+                }
+            }
             document.getElementById("ping").innerHTML = result + "<div"
-            + "style=\"display: block; height: 25px; text-align:center; line-height:25px;\">API Widgets last updated "
-            + today_string + "</div>";
+            + "style=\"display: block; height: 25px; text-align:center; line-height:25px;\">"
+            + past_errors + "</div>";
         })};
 
     ping();
