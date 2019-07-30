@@ -1,5 +1,4 @@
 import elasticsearch
-from datetime import date
 import time
 from pprint import pprint
 import math
@@ -13,15 +12,18 @@ month = 2592000000
 
 
 def elastic_day(query):
-    print(elastic_count(query, day))
+    # print(elastic_count(query, day))
+    return elastic_count(query, day)
 
 
 def elastic_week(query):
-    print(elastic_count(query, week))
+    # print(elastic_count(query, week))
+    return elastic_count(query, week)
 
 
 def elastic_month(query):
-    print(elastic_count(query, month))
+    # print(elastic_count(query, month))
+    return elastic_count(query, month)
 
 
 def elastic_count(query, interval):
@@ -35,14 +37,27 @@ def elastic_count(query, interval):
 
     # count
     count = response["hits"]["total"]
+    return count
 
-    # info
-    info = {
 
-    }
+# most recent logs this year
+def most_recent_logs(query):
+    now = math.floor(time.time() * 1000)
+    index = "prod-api-*"
 
-    return info, count
+    es = elasticsearch.Elasticsearch([db], http_auth=('kibana', 'SkyWatch123#@!'))
+    response = es.search(index=index, body=elastic_query(0, now, query))
 
+    three_recent_logs = []
+    list_of_logs = response["hits"]["hits"]
+    for i in range(3):
+        info = {"message_template": list_of_logs[i]["_source"]["messageTemplate"],
+                "exception_source": list_of_logs[i]["_source"]["exceptions"][0]["Message"],
+                "exception_message": list_of_logs[i]["_source"]["exceptions"][0]["Source"],
+                "timestamp": list_of_logs[i]["_source"]["@timestamp"]}
+        three_recent_logs.append(info)
+    # print(three_recent_logs)
+    return three_recent_logs
 
 
 
@@ -175,3 +190,8 @@ def elastic_query(old_time, now, query):
             "fragment_size": 2147483647
         }
     }
+
+# elastic_day("Level = Error")
+# elastic_week("Level = Error")
+# elastic_month("Level = Error")
+most_recent_logs("Level = Error")

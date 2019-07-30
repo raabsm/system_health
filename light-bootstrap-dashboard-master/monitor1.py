@@ -158,7 +158,8 @@ class PoliciesHandler(tornado.web.RequestHandler):
     def get(self):
         total_policies_query = 'SELECT COUNT(id) FROM "Insurance"."insurance_purchases"' \
                                'WHERE is_canceled = false'
-        most_recent_policy_query = 'SELECT date_added FROM "Insurance"."insurance_purchases" ORDER BY date_added DESC LIMIT 1'
+        most_recent_policy_query = 'SELECT date_added FROM "Insurance"."insurance_purchases" ORDER BY ' \
+                                   'date_added DESC LIMIT 1'
         self.write({'total_policies': format_number(query_database_single_response(total_policies_query)),
                     'most_recently_added': format_time(query_database_single_response(most_recent_policy_query))})
 
@@ -260,10 +261,11 @@ class ApiHandler(tornado.web.RequestHandler):
 
 class ErrorLogsHandler(tornado.web.RequestHandler):
     def get(self):
-        count_last_day = elasticlogs.count_last_24_hours()
-        count_last_month = elasticlogs.count_last_month()
-        count_last_week = elasticlogs.count_last_7_days()
-        most_recent_logs = elasticlogs.most_recent_logs()
+        query = "Level = Error"
+        count_last_day = elasticlogs.elastic_day(query)
+        count_last_month = elasticlogs.elastic_week(query)
+        count_last_week = elasticlogs.elastic_month(query)
+        most_recent_logs = elasticlogs.most_recent_logs(query)
         self.write({'count_last_day': count_last_day,
                     'count_last_week': count_last_week,
                     'count_last_month': count_last_month,
