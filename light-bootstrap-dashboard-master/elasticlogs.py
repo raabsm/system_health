@@ -207,4 +207,4 @@ def elastic_query(old_time, now, query):
 # elastic_day("Level = Error")
 # elastic_week("Level = Error")
 # elastic_month("Level = Error")
-most_recent_logs("Level = Error")
+# most_recent_logs("Level = Error")
