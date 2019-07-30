@@ -147,7 +147,7 @@ $().ready(function() {
             var today_string = hh+":"+mm+":"+ss;
 
             document.getElementById("ping").innerHTML = result + "<div"
-            + "style=\"display: inline-block; height: 25px; text-align:center; line-height:25px;\">API Widgets last updated "
+            + "style=\"display: block; height: 25px; text-align:center; line-height:25px;\">API Widgets last updated "
             + today_string + "</div>";
         })};
 

@@ -264,7 +264,7 @@ class ApiHandler(tornado.web.RequestHandler):
 
 class ErrorLogsHandler(tornado.web.RequestHandler):
     def get(self):
-        query = "Level = Error"
+        query = "Level = Error, level = Error"
         count_last_day = elasticlogs.elastic_day(query)
         count_last_week = elasticlogs.elastic_week(query)
         count_last_month = elasticlogs.elastic_month(query)
