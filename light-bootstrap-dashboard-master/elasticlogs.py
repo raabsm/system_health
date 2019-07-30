@@ -33,7 +33,7 @@ def elastic_count(query, interval):
     index = "prod-api-*"
 
     es = elasticsearch.Elasticsearch([db], http_auth=('kibana', 'SkyWatch123#@!'))
-    response = es.search(index=index, body=elastic_query(last_time, now, query))
+    response = es.search(index=index, body=elastic_query(last_time, now, query), request_timeout=30)
 
     # count
     count = response["hits"]["total"]
@@ -43,10 +43,11 @@ def elastic_count(query, interval):
 # most recent logs this year
 def most_recent_logs(query):
     now = math.floor(time.time() * 1000)
+    last_time = now - (3 * day)
     index = "prod-api-*"
 
     es = elasticsearch.Elasticsearch([db], http_auth=('kibana', 'SkyWatch123#@!'))
-    response = es.search(index=index, body=elastic_query(0, now, query))
+    response = es.search(index=index, body=elastic_query(last_time, now, query), request_timeout=30)
 
     three_recent_logs = []
     list_of_logs = response["hits"]["hits"]
@@ -194,4 +195,4 @@ def elastic_query(old_time, now, query):
 # elastic_day("Level = Error")
 # elastic_week("Level = Error")
 # elastic_month("Level = Error")
-most_recent_logs("Level = Error")
+# most_recent_logs("Level = Error")

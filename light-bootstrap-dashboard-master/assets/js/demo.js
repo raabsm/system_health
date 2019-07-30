@@ -88,10 +88,8 @@ $().ready(function() {
         for(i=0; i < len; i++) {
             var inner_text = "";
             var error = errors[i];
-            for(var key in error) {
-                console.log(key);
-                console.log(error[key]);
-                inner_text += "<p style=\"color: #5743AF\"><b>" + key + ":</b> " + error[key] + "</p>";
+            for(var key in error) {``
+                inner_text += "<p style=\"color: #ff0000 \"><b>" + key + ":</b> " + error[key] + "</p>";
             }
             $("#error_logs").append("<div class=\"col-md-4\"><div class=\"card \"><div class=\"card-body\">" +
             inner_text + "</div></div></div>");
@@ -148,7 +146,8 @@ $().ready(function() {
             if (ss < 10) {ss = "0"+ss;}
             var today_string = hh+":"+mm+":"+ss;
 
-            document.getElementById("ping").innerHTML = result + "<div class=\"text-center\">API Widgets last updated "
+            document.getElementById("ping").innerHTML = result + "<div"
+            + "style=\"display: inline-block; height: 25px; text-align:center; line-height:25px;\">API Widgets last updated "
             + today_string + "</div>";
         })};
 

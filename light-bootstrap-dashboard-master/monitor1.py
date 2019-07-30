@@ -15,6 +15,8 @@ import elasticlogs
 
 tornado.options.define('port', default=8889, help='port to listen on')
 
+currency = "$"
+
 
 def format_number(entry):
     if entry is None:
@@ -99,7 +101,7 @@ class GraphHandler(tornado.web.RequestHandler):
                                                                     },
                                                             'data': []
                                                             },
-                                      'revenue_last_month': {'title': 'Monthly Revenue',
+                                      'revenue_last_month': {'title': 'Monthly Revenue ' + currency,
                                                              'key': {'x': 'Month',
                                                                      'y1': 'Revenue'
                                                                      },
@@ -168,7 +170,6 @@ class PoliciesHandler(tornado.web.RequestHandler):
 
 class RevenueHandler(tornado.web.RequestHandler):
     def get(self):
-        currency = "$"
         total_revenue_query = 'SELECT SUM(final_price) FROM "Insurance"."insurance_purchases"'
         most_recent_policy_query = 'SELECT date_added FROM "Insurance"."insurance_purchases" ORDER BY date_added DESC'
         today = datetime.datetime.today()
@@ -265,8 +266,8 @@ class ErrorLogsHandler(tornado.web.RequestHandler):
     def get(self):
         query = "Level = Error"
         count_last_day = elasticlogs.elastic_day(query)
-        count_last_month = elasticlogs.elastic_week(query)
-        count_last_week = elasticlogs.elastic_month(query)
+        count_last_week = elasticlogs.elastic_week(query)
+        count_last_month = elasticlogs.elastic_month(query)
         most_recent_logs = elasticlogs.most_recent_logs(query)
         self.write({'count_last_day': count_last_day,
                     'count_last_week': count_last_week,
