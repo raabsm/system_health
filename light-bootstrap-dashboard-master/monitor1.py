@@ -17,6 +17,8 @@ tornado.options.define('port', default=8889, help='port to listen on')
 
 
 def format_number(entry):
+    if entry is None:
+        return '0'
     return "{:,}".format(round(entry))
 
 
