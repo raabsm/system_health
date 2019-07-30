@@ -30,7 +30,7 @@ $().ready(function() {
             fill_counter_widget(document.getElementById("num_users"),
                                 result['total_profiles'],
                                 result['total_last_week'],
-                                "Total User Count",
+                                "Total User Count:",
                                 "Joined in last 7 days:");
             add_timestamp(document.getElementById("user_stats"), result['most_recently_added']);
         });
@@ -82,7 +82,7 @@ $().ready(function() {
     };
 
     function fill_error_widgets(errors) {
-        document.getElementById("error_logs").innerHTML = ""
+        document.getElementById("error_logs").innerHTML = "<div><b>  Recent logs:</b></div><br>"
         var len = errors.length;
         var i;
         for(i=0; i < len; i++) {
@@ -91,8 +91,8 @@ $().ready(function() {
             for(var key in error) {``
                 inner_text += "<p style=\"color: #ff0000 \"><b>" + key + ":</b> " + error[key] + "</p>";
             }
-            $("#error_logs").append("<div class=\"col-md-4\"><div class=\"card \"><div class=\"card-body\">" +
-            inner_text + "</div></div></div>");
+            $("#error_logs").append("<div class=\"card \"><div class=\"card-body\">" +
+            inner_text + "</div></div>");
         }
     }
 
