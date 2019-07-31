@@ -151,10 +151,10 @@ class GraphHandler(tornado.web.RequestHandler):
         today = datetime.datetime.today()
         for num in range(0, 7):
             if days:
-                day = (today - relativedelta(days=num + 1))
+                day = (today - relativedelta(days=num))
                 next_day = day + datetime.timedelta(days=1)
             else:
-                day = (today - relativedelta(months=num + 1, day=1))
+                day = (today - relativedelta(months=num, day=1))
                 next_day = day + relativedelta(months=1, day=1)
             db_query = query.format(day.strftime("%Y-%m-%d"), next_day.strftime("%Y-%m-%d"))
             response = query_database_all_responses(db_query)[0]
