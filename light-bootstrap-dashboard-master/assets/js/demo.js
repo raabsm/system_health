@@ -62,6 +62,28 @@ $().ready(function() {
 
     function errors() {
         $.getJSON("/errors", function(result){
+
+                var link ="https://elasticsearch-us-prod.eastus.cloudapp.azure.com/app/kibana#/discover?_g=" +
+                      "(refreshInterval:(pause:!t,value:0),time:(from:now-5y,mode:quick,to:now))&_a=(columns:!(level)," +
+                      "filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:" +
+                      "'05010600-3079-11e9-962e-4b467b7ac4f3',key:level,negate:!t,params:(query:Information,type:" +
+                      "phrase),type:phrase,value:Information),query:(match:(level:(query:Information,type:phrase))))," +
+                      "('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'05010600-3079-11e9-962e-4b467b7a" +
+                      "c4f3',key:level,negate:!t,params:(query:Warning,type:phrase),type:phrase,value:Warning)," +
+                      "query:(match:(level:(query:Warning,type:phrase))))),index:'05010600-3079-11e9-962e-4b467b7a" +
+                      "c4f3',interval:auto,query:(language:lucene,query:''),sort:!('@timestamp',desc))"
+
+                document.getElementById("error-info").innerHTML = "<div class=\"col-md-4\"><div><b>  Error count:</b></div><br>" +
+                    "<div class=\"card \"><div class=\"card-body\"><div class=\"widget\" id=\"errors_24_hours\"" +
+                     "style=\"height: 180px;\"></div></div></div><div class=\"card \"><div class=\"card-body\">" +
+                     "<div class=\"widget\" id=\"errors_last_week\" style=\"height: 180px;\"></div></div></div>" +
+                     "<div class=\"card \"><div class=\"card-body\"><div class=\"widget\" id=\"errors_last_month\"" +
+                      "style=\"height: 180px;\"></div></div></div></div><div class = \"col-md-4\" id=\"error_logs\"" +
+                      "></div><div class = \"col-md-4\"><div><b>  Links:</b></div><br><div class=\"card \">" +
+                      "<a href=" + link + "><div class=\"" +
+                      "card-body\" style=\"height: 187px;\"><img src=\"assets/img/kibana.png\" style=\"max-width:100%;" +
+                       "max-height:100%;\"/></div></a></div>"
+
              fill_counter_widget(document.getElementById("errors_24_hours"),
                                 result['count_last_day'],
                                 null,
