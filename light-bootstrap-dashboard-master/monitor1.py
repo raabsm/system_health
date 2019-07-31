@@ -304,6 +304,7 @@ def application():
                 (r"/graphs", GraphHandler),
                 (r"/errors", ErrorLogsHandler),
                 (r"/assets/css/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/css"},),
+                (r"/assets/img/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/img"},),
                 (r"/assets/js/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/js"},),
                 (r"/assets/js/core/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/js/core"},),
                 (r"/assets/js/plugins/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/js/plugins"},),
