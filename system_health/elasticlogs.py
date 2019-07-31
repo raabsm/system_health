@@ -51,7 +51,7 @@ def most_recent_logs(query):
 
     three_recent_logs = []
     list_of_logs = response["hits"]["hits"]
-    for i in range(3):
+    for i in range(6):
 
         stamp = list_of_logs[i]["_source"]["@timestamp"]
         stamp = stamp[:stamp.find(".")].replace("T", " ")

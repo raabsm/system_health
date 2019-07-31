@@ -82,14 +82,15 @@ $().ready(function() {
 
                 document.getElementById("error-info").innerHTML = "<div class=\"col-md-4\"><div><b>  Error count:</b></div><br>" +
                     "<div class=\"card \"><div class=\"card-body\"><div class=\"widget\" id=\"errors_24_hours\"" +
-                     "style=\"height: 180px;\"></div></div></div><div class=\"card \"><div class=\"card-body\">" +
-                     "<div class=\"widget\" id=\"errors_last_week\" style=\"height: 180px;\"></div></div></div>" +
-                     "<div class=\"card \"><div class=\"card-body\"><div class=\"widget\" id=\"errors_last_month\"" +
-                      "style=\"height: 180px;\"></div></div></div></div><div class = \"col-md-4\" id=\"error_logs\"" +
-                      "></div><div class = \"col-md-4\"><div><b>  Links:</b></div><br><div class=\"card \">" +
-                      "<a href=" + link + "><div class=\"" +
-                      "card-body\" style=\"height: 187px;\"><img src=\"" + img + "\" style='max-width:100%;" +
-                       "max-height:100%;'" + "/" +"</div></a></div>"
+                    "style=\"height: 180px;\"></div></div></div><div class=\"card \"><div class=\"card-body\">" +
+                    "<div class=\"widget\" id=\"errors_last_week\" style=\"height: 180px;\"></div></div></div>" +
+                    "<div class=\"card \"><div class=\"card-body\"><div class=\"widget\" id=\"errors_last_month\"" +
+                    "style=\"height: 180px;\"></div></div></div></div>" +
+                    "<div class = \"col-md-2\" id=\"error_logs_1\"></div><div class=\"col-md-2\" id=\"error_logs_2\"></div>" +
+                    "</div><div class = \"col-md-4\"><div><b>  Links:</b></div><br><div class=\"card \">" +
+                    "<a href=" + link + "><div class=\"" +
+                    "card-body\" style=\"height: 187px;\"><img src=\"" + img + "\" style='max-width:100%;" +
+                    "max-height:100%;'" + "/" +"</div></a></div>"
 
              fill_counter_widget(document.getElementById("errors_24_hours"),
                                 result['count_last_day'],
@@ -111,7 +112,8 @@ $().ready(function() {
     };
 
     function fill_error_widgets(errors) {
-        document.getElementById("error_logs").innerHTML = "<div><b>  Recent logs:</b></div><br>"
+        document.getElementById("error_logs_1").innerHTML = "<div><b>  Recent logs:</b></div><br>"
+        document.getElementById("error_logs_2").innerHTML = "<div><b>              </b></div><br><br>"
         var len = errors.length;
         var i;
         for(i=0; i < len; i++) {
@@ -120,8 +122,14 @@ $().ready(function() {
             for(var key in error) {``
                 inner_text += "<p style=\"color: #ff0000 \"><b>" + key + ":</b> " + error[key] + "</p>";
             }
-            $("#error_logs").append("<div class=\"card \"><div class=\"card-body\">" +
-            inner_text + "</div></div>");
+            if (i < 3) {
+                $("#error_logs_1").append("<div class=\"card \"><div class=\"card-body\">" +
+                inner_text + "</div></div>");
+            }
+            else if (i >= 3){
+                $("#error_logs_2").append("<div class=\"card \"><div class=\"card-body\">" +
+                inner_text + "</div></div>");
+            }
         }
     }
 
