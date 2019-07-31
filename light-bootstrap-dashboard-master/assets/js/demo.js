@@ -33,6 +33,11 @@ $().ready(function() {
                                 "Total User Count:",
                                 "Joined in last 7 days:");
             add_timestamp(document.getElementById("user_stats"), result['most_recently_added']);
+            fill_counter_widget(document.getElementById("user_info"),
+                                result['total_address'],
+                                result['total_card'],
+                                "Total Users Who Filled Address Info:",
+                                "Card Info:");
         });
     };
 

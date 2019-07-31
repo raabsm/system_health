@@ -27,10 +27,13 @@ def format_number(entry):
 
 
 def format_time(time):
-    utc_time = pytz.utc.localize(time)
-    israel_timezone = pytz.timezone('Israel')
-    israel = utc_time.astimezone(israel_timezone)
-    return israel.strftime("%H:%M")
+    if time is not None:
+        utc_time = pytz.utc.localize(time)
+        israel_timezone = pytz.timezone('Israel')
+        israel = utc_time.astimezone(israel_timezone)
+        return israel.strftime("%H:%M")
+    else:
+        return "Time not available"
 
 
 def query_database_single_response(query):
@@ -79,13 +82,20 @@ class ProfilesHandler(tornado.web.RequestHandler):
     def get(self):
         total_profiles_query = 'SELECT COUNT(id) FROM "User"."profiles"'
         last_profile_added = 'SELECT date_added FROM "User"."profiles" ORDER BY date_added DESC'
+        filled_address_and_card = 'SELECT count(addresses.address1), count(profiles.stripe_customer_id) ' \
+                                  'FROM "User"."profiles" profiles INNER JOIN "User"."addresses" addresses ' \
+                                  'ON (profiles.id = addresses.user_profile_id)'
         today = datetime.datetime.today()
         last_week = (today - datetime.timedelta(days=7))
         profiles_last_week_query = total_profiles_query \
                                    + ' WHERE date_added > \'{0}\''.format(last_week.strftime("%Y-%m-%d"))
+        num_filled_address, num_filled_card = query_database_all_responses(filled_address_and_card)[0]
+
         data = {'total_profiles': format_number(query_database_single_response(total_profiles_query)),
                 'most_recently_added': format_time(query_database_single_response(last_profile_added)),
-                'total_last_week': format_number(query_database_single_response(profiles_last_week_query))}
+                'total_last_week': format_number(query_database_single_response(profiles_last_week_query)),
+                'total_address': format_number(num_filled_address),
+                'total_card': format_number(num_filled_card)}
         self.write(data)
 
 
@@ -175,7 +185,7 @@ class PoliciesHandler(tornado.web.RequestHandler):
 class RevenueHandler(tornado.web.RequestHandler):
     def get(self):
         total_revenue_query = 'SELECT SUM(final_price) FROM "Insurance"."insurance_purchases"'
-        most_recent_policy_query = 'SELECT date_added FROM "Insurance"."insurance_purchases" ORDER BY date_added DESC'
+        most_recent_policy_query = 'SELECT date_added FROM "Insurance"."insurance_purchases" ORDER BY date_added DESC LIMIT 1'
         today = datetime.datetime.today()
         revenue_today = total_revenue_query + ' WHERE date_added > \'{}\''.format(today.strftime("%Y-%m-%d"))
         self.write({'total_revenue': currency + format_number(query_database_single_response(total_revenue_query)),
@@ -264,7 +274,7 @@ class ApiHandler(tornado.web.RequestHandler):
                     ]
                 }
             },
-           "start_time": 96510964051541
+           "start_time": 9651096405567
         }
         response = requests.post(skywatch_api, json=data_to_input)
         return response

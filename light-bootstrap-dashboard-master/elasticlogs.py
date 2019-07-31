@@ -60,8 +60,8 @@ def most_recent_logs(query):
         message = (message[:115] + '...') if len(message) > 115 else message
 
         info = {"message_template": message,
-                "exception_source": list_of_logs[i]["_source"]["exceptions"][0]["Message"],
-                "exception_message": list_of_logs[i]["_source"]["exceptions"][0]["Source"],
+                "exception_message": list_of_logs[i]["_source"]["exceptions"][0]["Message"],
+                "exception_source": list_of_logs[i]["_source"]["exceptions"][0]["Source"],
                 "timestamp": stamp}
         three_recent_logs.append(info)
     return three_recent_logs
