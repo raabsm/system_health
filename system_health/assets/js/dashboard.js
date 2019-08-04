@@ -1,9 +1,8 @@
 
 $().ready(function() {
+//     1     =====================================================================================================================//
 
-
-
-//=====================================================================================================================//
+//                                           META WIDGETS
     var user_count;
     var policy_count;
     var revenue_today;
@@ -15,6 +14,8 @@ $().ready(function() {
         element.innerHTML = to_insert;
     }
 
+
+// Here is the function which will encapsulate the widgets in a standard FORMAT
     function fill_counter_widget(element, counter, sub_counter, title, sub_title){
         var to_insert = "<br><p style=\"color: #5743AF\">" + title + "<h1 style=\"color: #5743AF\">"
              + counter + "</h1></p>";
@@ -25,6 +26,7 @@ $().ready(function() {
         element.innerHTML = to_insert;
     }
 
+// Here the function returns the PROFILE COUNT widget
     function profiles() {
         $.getJSON("/profiles", function(result){
             fill_counter_widget(document.getElementById("num_users"),
@@ -41,6 +43,7 @@ $().ready(function() {
         });
     };
 
+// Here the function returns the POLICY COUNT widget
     function policies() {
         $.getJSON("/policies", function(result){
             fill_counter_widget(document.getElementById("num_policies"),
@@ -53,6 +56,7 @@ $().ready(function() {
         });
     };
 
+// Here the function returns the REVENUE widget
     function revenue() {
         $.getJSON("/revenue", function(result){
              fill_counter_widget(document.getElementById("revenue"),
@@ -65,18 +69,11 @@ $().ready(function() {
         });
     };
 
+
+//HERE IS THE FUNCTION WHICH, AFTER QUERYING THE RELEVANT HANDLER, WILL DISPLAY ERROR WIDGETS
+//These error widgets include both the ERROR COUNT and the RECENT ERROR LOGS
     function errors() {
         $.getJSON("/errors", function(result){
-
-//                var link ="https://elasticsearch-us-prod.eastus.cloudapp.azure.com/app/kibana#/discover?_g=" +
-//                      "(refreshInterval:(pause:!t,value:0),time:(from:now-5y,mode:quick,to:now))&_a=(columns:!(level)," +
-//                      "filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:" +
-//                      "'05010600-3079-11e9-962e-4b467b7ac4f3',key:level,negate:!t,params:(query:Information,type:" +
-//                      "phrase),type:phrase,value:Information),query:(match:(level:(query:Information,type:phrase))))," +
-//                      "('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'05010600-3079-11e9-962e-4b467b7a" +
-//                      "c4f3',key:level,negate:!t,params:(query:Warning,type:phrase),type:phrase,value:Warning)," +
-//                      "query:(match:(level:(query:Warning,type:phrase))))),index:'05010600-3079-11e9-962e-4b467b7a" +
-//                      "c4f3',interval:auto,query:(language:lucene,query:''),sort:!('@timestamp',desc))"
 
                 var img = "assets/img/kibana.png"
 
@@ -90,12 +87,7 @@ $().ready(function() {
                     "<div class=\"widget\" id=\"errors_last_week\" style=\"height: 180px;\"></div></div></div></a>" +
                     "<a href=" + month_link + "><div class=\"card \"><div class=\"card-body\"><div class=\"widget\" id=\"errors_last_month\"" +
                     "style=\"height: 180px;\"></div></div></div></div></a>" +
-                    "<div class = \"col-md-8\" id=\"error_logs\"></div>" +
-                    "</div>"
-//                    "<div class = \"col-md-4\"><div><b>  Links:</b></div><br><div class=\"card \">" +
-//                    "<a href=" + link + "><div class=\"" +
-//                    "card-body\" style=\"height: 187px;\"><img src=\"" + img + "\" style='max-width:100%;" +
-//                    "max-height:100%;'" + "/" +"</div></a></div>"
+                    "<div class = \"col-md-8\" id=\"error_logs\"></div>"
 
              fill_counter_widget(document.getElementById("errors_24_hours"),
                                 result['count_last_day'],
@@ -116,12 +108,13 @@ $().ready(function() {
         });
     };
 
+//Here the error widgets take on a different format to the counter widget, so a new function is made to modify the format
     function fill_error_widgets(errors) {
         document.getElementById("error_logs").innerHTML = "<div><b>  Recent logs:</b></div><br>"
         var len = errors.length;
         var i;
         for(i=0; i < len; i++) {
-        var inner_text = "";
+            var inner_text = "";
             var error = errors[i];
             var id = error['id'];
             var index = "05010600-3079-11e9-962e-4b467b7ac4f3";
@@ -148,6 +141,7 @@ $().ready(function() {
     revenue();
     errors();
 
+//HERE AN INTERVAL IS SET (IN MILLISECONDS) IN ORDER TO CAUSE THE PAGE TO REFRESH PERIODICALLY
     setInterval( function() {
         profiles();
         policies();
@@ -159,9 +153,16 @@ $().ready(function() {
         $('#f1_card').toggleClass("transformStyle transformRotate");
     }, 3000);
 
-//=====================================================================================================================//
 
-    //api pings
+
+
+
+
+//     2     =====================================================================================================================//
+
+//                                        PING WIDGETS
+
+    // Here is a function that calls and returns widgets for the api calls
     function ping() {
         $.getJSON("/api", function(data){
             var apis = data['api'];
@@ -206,6 +207,8 @@ $().ready(function() {
         })};
 
     ping();
+
+//    AGAIN, HERE AN INTERVAL IS SET (IN MILLISECONDS) IN ORDER TO CAUSE THE PAGE TO REFRESH PERIODICALLY
     setInterval(function() {
         ping();
     }, 60000);
@@ -334,6 +337,9 @@ $().ready(function() {
 
 type = ['primary', 'info', 'success', 'warning', 'danger'];
 
+//     3     ==============================================================================================================//
+
+//                                              GRAPHING
 
 demo = {
 
