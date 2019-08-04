@@ -35,23 +35,13 @@
 </head>
 
 <body>
-
-<!--    <div id="f1_container">-->
-<!--    <div id="f1_card" class="shadow">-->
-<!--      <div class="front face">-->
-<!--        <img src="http://css3.bradshawenterprises.com/images/Windows%20Logo.jpg"/>-->
-<!--      </div>-->
-<!--      <div class="back face center">-->
-<!--        <p>This is nice for exposing more information about an image.</p>-->
-<!--        <p>Any content can go here.</p>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--    </div><br><br><br><br>-->
-
     <div class="content">
         <div class="container-fluid">
             <br><br>
+<!--            Here is the row which will contain the widgets informing the user on system health via api calls -->
             <div class="row" id="ping"></div>
+
+<!--            Here is the row containing the meta widgets -->
             <div class = "row" id="metawidgets">
                 <div class="col-md-3">
                     <div class="card ">
@@ -86,10 +76,14 @@
                 </div>
 
             </div>
+<!--            Here lies the row which will contain all of the relevant graphs -->
             <div class="row" id="bar-charts"></div>
-             <div class = "row" id="error-info"></div>
+<!--            Here lies the row which will contain columns concerning error count and recent error logs -->
+            <div class = "row" id="error-info"></div>
         </div>
     </div>
+
+<!--            Here is the web page footer -->
     <footer class="footer">
         <div class="container-fluid">
             <nav>

@@ -13,7 +13,7 @@ import time
 import pytz
 import elasticlogs
 
-tornado.options.define('port', default=8889, help='port to listen on')
+tornado.options.define('port', default=8888, help='port to listen on')
 
 currency = "$"
 

@@ -68,29 +68,34 @@ $().ready(function() {
     function errors() {
         $.getJSON("/errors", function(result){
 
-                var link ="https://elasticsearch-us-prod.eastus.cloudapp.azure.com/app/kibana#/discover?_g=" +
-                      "(refreshInterval:(pause:!t,value:0),time:(from:now-5y,mode:quick,to:now))&_a=(columns:!(level)," +
-                      "filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:" +
-                      "'05010600-3079-11e9-962e-4b467b7ac4f3',key:level,negate:!t,params:(query:Information,type:" +
-                      "phrase),type:phrase,value:Information),query:(match:(level:(query:Information,type:phrase))))," +
-                      "('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'05010600-3079-11e9-962e-4b467b7a" +
-                      "c4f3',key:level,negate:!t,params:(query:Warning,type:phrase),type:phrase,value:Warning)," +
-                      "query:(match:(level:(query:Warning,type:phrase))))),index:'05010600-3079-11e9-962e-4b467b7a" +
-                      "c4f3',interval:auto,query:(language:lucene,query:''),sort:!('@timestamp',desc))"
+//                var link ="https://elasticsearch-us-prod.eastus.cloudapp.azure.com/app/kibana#/discover?_g=" +
+//                      "(refreshInterval:(pause:!t,value:0),time:(from:now-5y,mode:quick,to:now))&_a=(columns:!(level)," +
+//                      "filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:" +
+//                      "'05010600-3079-11e9-962e-4b467b7ac4f3',key:level,negate:!t,params:(query:Information,type:" +
+//                      "phrase),type:phrase,value:Information),query:(match:(level:(query:Information,type:phrase))))," +
+//                      "('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'05010600-3079-11e9-962e-4b467b7a" +
+//                      "c4f3',key:level,negate:!t,params:(query:Warning,type:phrase),type:phrase,value:Warning)," +
+//                      "query:(match:(level:(query:Warning,type:phrase))))),index:'05010600-3079-11e9-962e-4b467b7a" +
+//                      "c4f3',interval:auto,query:(language:lucene,query:''),sort:!('@timestamp',desc))"
 
                 var img = "assets/img/kibana.png"
 
+                var day_link = "https://elasticsearch-us-prod.eastus.cloudapp.azure.com/app/kibana#/discover?_g=(refreshInterval:(pause:!t,value:0),time:(from:now-24h,mode:quick,to:now))&_a=(columns:!(_source),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'05010600-3079-11e9-962e-4b467b7ac4f3',key:level,negate:!t,params:(query:Warning,type:phrase),type:phrase,value:Warning),query:(match:(level:(query:Warning,type:phrase))))),index:'05010600-3079-11e9-962e-4b467b7ac4f3',interval:auto,query:(language:lucene,query:error),sort:!('@timestamp',desc))";
+                var week_link = "https://elasticsearch-us-prod.eastus.cloudapp.azure.com/app/kibana#/discover?_g=(refreshInterval:(pause:!t,value:0),time:(from:now-7d,mode:quick,to:now))&_a=(columns:!(_source),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'05010600-3079-11e9-962e-4b467b7ac4f3',key:level,negate:!t,params:(query:Warning,type:phrase),type:phrase,value:Warning),query:(match:(level:(query:Warning,type:phrase))))),index:'05010600-3079-11e9-962e-4b467b7ac4f3',interval:auto,query:(language:lucene,query:error),sort:!('@timestamp',desc))";
+                var month_link = "https://elasticsearch-us-prod.eastus.cloudapp.azure.com/app/kibana#/discover?_g=(refreshInterval:(pause:!t,value:0),time:(from:now-30d,mode:quick,to:now))&_a=(columns:!(_source),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'05010600-3079-11e9-962e-4b467b7ac4f3',key:level,negate:!t,params:(query:Warning,type:phrase),type:phrase,value:Warning),query:(match:(level:(query:Warning,type:phrase))))),index:'05010600-3079-11e9-962e-4b467b7ac4f3',interval:auto,query:(language:lucene,query:error),sort:!('@timestamp',desc))";
+
                 document.getElementById("error-info").innerHTML = "<div class=\"col-md-4\"><div><b>  Error count:</b></div><br>" +
-                    "<div class=\"card \"><div class=\"card-body\"><div class=\"widget\" id=\"errors_24_hours\"" +
-                    "style=\"height: 180px;\"></div></div></div><div class=\"card \"><div class=\"card-body\">" +
-                    "<div class=\"widget\" id=\"errors_last_week\" style=\"height: 180px;\"></div></div></div>" +
-                    "<div class=\"card \"><div class=\"card-body\"><div class=\"widget\" id=\"errors_last_month\"" +
-                    "style=\"height: 180px;\"></div></div></div></div>" +
-                    "<div class = \"col-md-2\" id=\"error_logs_1\"></div><div class=\"col-md-2\" id=\"error_logs_2\"></div>" +
-                    "</div><div class = \"col-md-4\"><div><b>  Links:</b></div><br><div class=\"card \">" +
-                    "<a href=" + link + "><div class=\"" +
-                    "card-body\" style=\"height: 187px;\"><img src=\"" + img + "\" style='max-width:100%;" +
-                    "max-height:100%;'" + "/" +"</div></a></div>"
+                    "<a href=" + day_link + "><div class=\"card \"><div class=\"card-body\"><div class=\"widget\" id=\"errors_24_hours\"" +
+                    "style=\"height: 180px;\"></div></div></div></a><a href=" + week_link + "><div class=\"card \"><div class=\"card-body\">" +
+                    "<div class=\"widget\" id=\"errors_last_week\" style=\"height: 180px;\"></div></div></div></a>" +
+                    "<a href=" + month_link + "><div class=\"card \"><div class=\"card-body\"><div class=\"widget\" id=\"errors_last_month\"" +
+                    "style=\"height: 180px;\"></div></div></div></div></a>" +
+                    "<div class = \"col-md-8\" id=\"error_logs\"></div>" +
+                    "</div>"
+//                    "<div class = \"col-md-4\"><div><b>  Links:</b></div><br><div class=\"card \">" +
+//                    "<a href=" + link + "><div class=\"" +
+//                    "card-body\" style=\"height: 187px;\"><img src=\"" + img + "\" style='max-width:100%;" +
+//                    "max-height:100%;'" + "/" +"</div></a></div>"
 
              fill_counter_widget(document.getElementById("errors_24_hours"),
                                 result['count_last_day'],
@@ -112,26 +117,31 @@ $().ready(function() {
     };
 
     function fill_error_widgets(errors) {
-        document.getElementById("error_logs_1").innerHTML = "<div><b>  Recent logs:</b></div><br>"
-        document.getElementById("error_logs_2").innerHTML = "<div><b>              </b></div><br><br>"
+        document.getElementById("error_logs").innerHTML = "<div><b>  Recent logs:</b></div><br>"
         var len = errors.length;
         var i;
         for(i=0; i < len; i++) {
-            var inner_text = "";
+        var inner_text = "";
             var error = errors[i];
-            for(var key in error) {``
+            var id = error['id'];
+            var index = "05010600-3079-11e9-962e-4b467b7ac4f3";
+            var link = "https://elasticsearch-us-prod.eastus.cloudapp.azure.com/app/kibana#/context/" +
+                        index + "/General/" + id + "?_a=(columns:!(_source),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!t,index:\'" +
+                        index +"\',key:level,negate:!t,params:(query:Warning,type:phrase),type:phrase,value:Warning)," +
+                        "query:(match:(level:(query:Warning,type:phrase))))),predecessorCount:5,sort:!" +
+                        "('@timestamp',desc),successorCount:5)&_g=()";
+            for(var key in error) {
                 inner_text += "<p style=\"color: #ff0000 \"><b>" + key + ":</b> " + error[key] + "</p>";
             }
-            if (i < 3) {
-                $("#error_logs_1").append("<div class=\"card \"><div class=\"card-body\">" +
-                inner_text + "</div></div>");
-            }
-            else if (i >= 3){
-                $("#error_logs_2").append("<div class=\"card \"><div class=\"card-body\">" +
-                inner_text + "</div></div>");
+
+            inner_text = "<a href=" + link + ">" + inner_text + "</a>";
+
+            $("#error_logs").append("<div class=\"card \"><div class=\"card-body\">" +
+            inner_text + "</div></div>");
+
             }
         }
-    }
+
 
     profiles();
     policies();
@@ -143,7 +153,7 @@ $().ready(function() {
         policies();
         revenue();
         errors();
-    }, 5000);
+    }, 120000);
 
     setInterval(function() {
         $('#f1_card').toggleClass("transformStyle transformRotate");
