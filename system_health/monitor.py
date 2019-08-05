@@ -50,18 +50,21 @@ def query_database_all_responses(query):
     return response
 
 
-def add_api_data(dictionary, api_name, response):
-    if response.status_code != 200:
-        active = False
-    else:
-        active = True
-    response_time = str(response.elapsed.total_seconds())
+def add_api_data(dictionary, api_name, active, rt):
     if not active:
         global api_errors
         api_errors.append({api_name:datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S")})
     dictionary['api'].append({'name': api_name, 'info': {'active': active,
-                                                         'response_time': response_time}})
+                                                         'response_time': rt}})
     return dictionary
+
+
+def check_response(response):
+    response_time = str(response.elapsed.total_seconds())
+    if response.status_code != 200:
+        return False, response_time
+    else:
+        return True, response_time
 
 
 class DBError(Exception):
@@ -196,24 +199,26 @@ class RevenueHandler(tornado.web.RequestHandler):
 class ApiHandler(tornado.web.RequestHandler):
     def get(self):
         data = {'api': []}
-        hazard_response = self.query_hazard_service(40.791859, -84.434, 30, 'http://hazards.skywatch.ai')
-        skywatch_response = self.query_skywatch_api()
-        airmap_response = self.query_airmap()
-        add_api_data(data, 'hazard_api', hazard_response)
-        add_api_data(data, 'skywatch_api', skywatch_response)
-        add_api_data(data, 'airmap_api', airmap_response)
-        self.test_database(data)
+        hazard_active, hazard_rt = self.query_hazard_service(40.791859, -84.434, 30, 'http://hazards.skywatch.ai')
+        skywatch_active, skywatch_rt = self.query_skywatch_api()
+        airmap_active, airmap_rt = self.query_airmap()
+        db_active, db_rt = self.test_database()
+        add_api_data(data, 'hazard_api', hazard_active, hazard_rt)
+        add_api_data(data, 'skywatch_api', skywatch_active, skywatch_rt)
+        add_api_data(data, 'airmap_api', airmap_active, airmap_rt)
+        add_api_data(data, 'Database', db_active, db_rt)
         data['errors'] = api_errors
         self.write(data)
 
     def query_hazard_service(self, lat, lng, radius, url):
-        response = requests.post(url + "/sfa_handler_safe",
-                                 json={"lat": lat, "lng": lng, "radius": radius, "request_type": "point_safety"})
-        return response
-        # return zlib.decompress(pybase64.standard_b64decode(json.loads(requests.post(url + "/sfa_handler_safe",
-        #                 json={"lat": lat, "lng": lng, "radius": radius, "request_type": "point_safety"}).content)['data']))
+        try:
+            response = requests.post(url + "/sfa_handler_safe",
+                                 json={"lat": lat, "lng": lng, "radius": radius, "request_type": "point_safety"}, timeout=10)
+            return check_response(response)
+        except (requests.Timeout, requests.ConnectionError):
+            return False, 'TIMEOUT'
 
-    def test_database(self, dictionary):
+    def test_database(self):
         example_query = 'SELECT id FROM "Insurance"."insurance_policies" LIMIT 1'
         start_time = time.time()
         response = query_database_single_response(example_query)
@@ -224,12 +229,7 @@ class ApiHandler(tornado.web.RequestHandler):
         else:
             active = False
             response_time = 0
-        if not active:
-            global api_errors
-            api_errors.append({'Database': datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S")})
-        dictionary['api'].append({'name': 'Database', 'info': {'active': active,
-                                                               'response_time': str(response_time)}})
-        return dictionary
+        return active, str(response_time)
 
     def query_airmap(self):
         url = "https://api.airmap.com/aircraft/v2/manufacturer"
@@ -237,8 +237,12 @@ class ApiHandler(tornado.web.RequestHandler):
             'accept': "application/json",
             'x-api-key': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVkZW50aWFsX2lkIjoiY3JlZGVudGlhbHxLYTNrZ1B4RktReW1kZ2h5N3F2cEFzTUFKYTVnIiwiYXBwbGljYXRpb25faWQiOiJhcHBsaWNhdGlvbnxhWVlhNG1kSGQ0QmdPRkdwTGdiT0ZrTjAwWFAiLCJvcmdhbml6YXRpb25faWQiOiJkZXZlbG9wZXJ8UHlNTHkzWUZnM2IyTUtpeUVsYldic1FnbUw0RCIsImlhdCI6MTUxOTU4MTQ4OX0.rnz4zjKkyO9dzDW5S8bhkIOjwRPLuoUaXT0kqNcHgzo"
         }
-        response = requests.request("GET", url, headers=headers)
-        return response
+        try:
+            response = requests.request("GET", url, headers=headers, timeout=10)
+        except (requests.Timeout, requests.ConnectionError):
+            return False, 'Timeout'
+
+        return check_response(response)
 
     def query_skywatch_api(self):
         skywatch_api = 'http://api.us-dev.skywatch.ai/api/insurances/offers'
@@ -276,8 +280,11 @@ class ApiHandler(tornado.web.RequestHandler):
             },
            "start_time": 9651096405567
         }
-        response = requests.post(skywatch_api, json=data_to_input)
-        return response
+        try:
+            response = response = requests.post(skywatch_api, json=data_to_input, timeout=10)
+        except (requests.Timeout, requests.ConnectionError):
+            return False, 'Timeout'
+        return check_response(response)
 
 
 class ErrorLogsHandler(tornado.web.RequestHandler):
