@@ -171,10 +171,10 @@ $().ready(function() {
             for (i = 0; i < apis.length; i++) {
 
                 if (apis[i]['info']['active']) {
-                    var sign = "<i class=\"fa fa-circle text-success\"></i>";
+                    var sign = "<div style=\"font-size: 3rem;\"><i class=\"fa fa-circle text-success\"></i></div>";
                 }
                 else {
-                    var sign = "<i class=\"fa fa-circle text-danger\"></i>";
+                    var sign = "<div style=\"font-size: 3rem;\"><i class=\"fa fa-circle text-danger\"></i></div>";
                 }
 
                 var response_time = apis[i]['info']['response_time'];
@@ -442,7 +442,7 @@ demo = {
             var second_val = "";
             var third_val = "";
             if('y2' in val['key']) {
-                second_val = "<i class=\"fa fa-circle text-danger\"></i>" + val['key']['y2'];
+                second_val = "<i class=\"fa fa-circle text-danger\" ></i>" + val['key']['y2'];
             }
             if('y3' in val['key']) {
                 third_val = "<i class=\"fa fa-circle text-warning\"></i>" + val['key']['y3'];
