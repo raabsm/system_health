@@ -118,7 +118,8 @@ def query_skywatch_api():
                 ]
             }
         },
-        "start_time": 9651096405567
+        # "start_time": 9651096405567
+        "start_time": 9651096
     }
     try:
         response = response = requests.post(skywatch_api, json=data_to_input, timeout=10)
@@ -129,8 +130,8 @@ def query_skywatch_api():
 
 def add_api_data(dictionary, errors, api_name, active, rt):
     if not active:
-        errors.append({api_name: {'timestamp': datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
-                                  'response_time': rt}})
+        errors['{}.errors'.format(api_name)] = {'timestamp': datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
+                                                'response_time': rt}
     dictionary['{}.most_recent_log'.format(api_name)] = {'active': active,
                                                          'response_time': rt}
 
@@ -156,11 +157,12 @@ def insert_into_db(most_recent, errors):
     db = connection['MyDatabase']
     collection = db['API_Logs']
     collection.update_one({'_id': ObjectId(doc_id)}, {"$set": most_recent})
+    collection.update_one({'_id': ObjectId(doc_id)}, {"$push": errors})
 
 
 if __name__ == '__main__':
     most_recent_data = {}
-    api_errors = []
+    api_errors = {}
     update_recent_log(most_recent_data, api_errors)
     print(most_recent_data)
     print(api_errors)
