@@ -5,17 +5,6 @@ import psycopg2
 import datetime
 from bson import ObjectId
 
-import pprint
-
-# cursor = collection.find({})
-# for doc in cursor:
-#     print(doc)
-# inserted_document = collection.insert_one({'logs': []})
-# doc_id = inserted_document.inserted_id
-#
-# collection.update_one({'_id': doc_id}, {"$push": {'logs': log_document}})
-#
-#
 uri = "mongodb://health-dashboard-mongo:" \
       "2unhwWjCwN1KaLWRmBPRbrIu6yNmax5A2FlHycleFjH65pB9sTvYJrU9ihMeUIbA2hpJehgmwa0tJUgsQHB5zw" \
       "==@health-dashboard-mongo.documents.azure.com:10255/?ssl=true&replicaSet=globaldb"
@@ -118,8 +107,7 @@ def query_skywatch_api():
                 ]
             }
         },
-        # "start_time": 9651096405567
-        "start_time": 9651096
+         "start_time": 9651096405567
     }
     try:
         response = response = requests.post(skywatch_api, json=data_to_input, timeout=10)
@@ -164,8 +152,6 @@ if __name__ == '__main__':
     most_recent_data = {}
     api_errors = {}
     update_recent_log(most_recent_data, api_errors)
-    print(most_recent_data)
-    print(api_errors)
     insert_into_db(most_recent_data, api_errors)
 
 

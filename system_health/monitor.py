@@ -3,13 +3,10 @@ import tornado.ioloop
 import tornado.httpserver
 import tornado.options
 import datetime
-import requests
-import json
+import pymongo
+from bson import ObjectId
 from dateutil.relativedelta import relativedelta
 import DBConnection
-# import zlib
-# import pybase64
-import time
 import pytz
 import elasticlogs
 
@@ -17,7 +14,13 @@ tornado.options.define('port', default=8888, help='port to listen on')
 
 currency = "$"
 
-api_errors = []
+uri = "mongodb://health-dashboard-mongo:" \
+      "2unhwWjCwN1KaLWRmBPRbrIu6yNmax5A2FlHycleFjH65pB9sTvYJrU9ihMeUIbA2hpJehgmwa0tJUgsQHB5zw" \
+      "==@health-dashboard-mongo.documents.azure.com:10255/?ssl=true&replicaSet=globaldb"
+
+connection = pymongo.MongoClient(uri)
+mongo_db = connection['MyDatabase']
+doc_id = "5d49785591ed6e2f4815a4de"
 
 
 def format_number(entry):
@@ -198,94 +201,11 @@ class RevenueHandler(tornado.web.RequestHandler):
 
 class ApiHandler(tornado.web.RequestHandler):
     def get(self):
-        data = {'api': []}
-        hazard_active, hazard_rt = self.query_hazard_service(40.791859, -84.434, 30, 'http://hazards.skywatch.ai')
-        skywatch_active, skywatch_rt = self.query_skywatch_api()
-        airmap_active, airmap_rt = self.query_airmap()
-        db_active, db_rt = self.test_database()
-        add_api_data(data, 'hazard_api', hazard_active, hazard_rt)
-        add_api_data(data, 'skywatch_api', skywatch_active, skywatch_rt)
-        add_api_data(data, 'airmap_api', airmap_active, airmap_rt)
-        add_api_data(data, 'Database', db_active, db_rt)
-        data['errors'] = api_errors
-        self.write(data)
-
-    def query_hazard_service(self, lat, lng, radius, url):
-        try:
-            response = requests.post(url + "/sfa_handler_safe",
-                                 json={"lat": lat, "lng": lng, "radius": radius, "request_type": "point_safety"}, timeout=10)
-            return check_response(response)
-        except (requests.Timeout, requests.ConnectionError):
-            return False, 'TIMEOUT'
-
-    def test_database(self):
-        example_query = 'SELECT id FROM "Insurance"."insurance_policies" LIMIT 1'
-        start_time = time.time()
-        response = query_database_single_response(example_query)
-        end_time = time.time()
-        if response is not None:
-            active = True
-            response_time = round(end_time - start_time, 4)
-        else:
-            active = False
-            response_time = 0
-        return active, str(response_time)
-
-    def query_airmap(self):
-        url = "https://api.airmap.com/aircraft/v2/manufacturer"
-        headers = {
-            'accept': "application/json",
-            'x-api-key': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVkZW50aWFsX2lkIjoiY3JlZGVudGlhbHxLYTNrZ1B4RktReW1kZ2h5N3F2cEFzTUFKYTVnIiwiYXBwbGljYXRpb25faWQiOiJhcHBsaWNhdGlvbnxhWVlhNG1kSGQ0QmdPRkdwTGdiT0ZrTjAwWFAiLCJvcmdhbml6YXRpb25faWQiOiJkZXZlbG9wZXJ8UHlNTHkzWUZnM2IyTUtpeUVsYldic1FnbUw0RCIsImlhdCI6MTUxOTU4MTQ4OX0.rnz4zjKkyO9dzDW5S8bhkIOjwRPLuoUaXT0kqNcHgzo"
-        }
-        try:
-            response = requests.request("GET", url, headers=headers, timeout=10)
-        except (requests.Timeout, requests.ConnectionError):
-            return False, 'Timeout'
-
-        return check_response(response)
-
-    def query_skywatch_api(self):
-        skywatch_api = 'http://api.us-dev.skywatch.ai/api/insurances/offers'
-        data_to_input = {
-            "airspace": {
-                "type": "Feature",
-                "properties": {},
-                "geometry": {
-                    "type": "Polygon",
-                    "coordinates": [
-                        [
-                            [
-                                -6.86370849656,
-                                52.35211857272093
-                            ],
-                            [
-                                -6.847229003543,
-                                52.3336607715546
-                            ],
-                            [
-                                -6.84448245436,
-                                52.35211857272093
-                            ],
-                            [
-                                -6.8637084564544,
-                                52.35211857272093
-                            ],
-                            [
-                                -6.86370849656,
-                                52.35211857272093
-                            ]
-                        ]
-                    ]
-                }
-            },
-           "start_time": 9651096405567
-        }
-        try:
-            response = response = requests.post(skywatch_api, json=data_to_input, timeout=10)
-        except (requests.Timeout, requests.ConnectionError):
-            return False, 'Timeout'
-        return check_response(response)
-
+        collection = mongo_db['API_Logs']
+        api_logs = collection.find_one({'_id': ObjectId(doc_id)})
+        del api_logs['_id']
+        self.write(api_logs)
+        
 
 class ErrorLogsHandler(tornado.web.RequestHandler):
     def get(self):
