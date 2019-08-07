@@ -53,15 +53,6 @@ def query_database_all_responses(query):
     return response
 
 
-def add_api_data(dictionary, api_name, active, rt):
-    if not active:
-        global api_errors
-        api_errors.append({api_name:datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S")})
-    dictionary['api'].append({'name': api_name, 'info': {'active': active,
-                                                         'response_time': rt}})
-    return dictionary
-
-
 def check_response(response):
     response_time = str(response.elapsed.total_seconds())
     if response.status_code != 200:

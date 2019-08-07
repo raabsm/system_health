@@ -1,8 +1,6 @@
 import elasticsearch
 import time
-from pprint import pprint
 import math
-import re
 
 db = "http://elasticsearch-us-prod.eastus.cloudapp.azure.com:9200/"
 
@@ -55,6 +53,7 @@ def most_recent_logs(query):
 
         stamp = list_of_logs[i]["_source"]["@timestamp"]
         stamp = stamp[:stamp.find(".")].replace("T", " ")
+        stamp += " UTC"
 
         message = list_of_logs[i]["_source"]["messageTemplate"]
         message = (message[:115] + '...') if len(message) > 115 else message

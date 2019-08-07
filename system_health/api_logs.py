@@ -125,7 +125,7 @@ def add_api_data(dictionary, errors, api_name, active, rt):
 
 
 def add_timestamp(dic):
-    dic['timestamp'] = datetime.datetime.today().strftime("%H:%M:%S")
+    dic['timestamp'] = datetime.datetime.today().strftime("%H:%M:%S") + " UTC"
 
 
 def update_recent_log(most_recent, errors):
