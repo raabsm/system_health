@@ -118,9 +118,9 @@ def query_skywatch_api():
 
 def add_api_data(dictionary, errors, api_name, active, rt):
     if not active:
-        errors['{}.errors'.format(api_name)] = {'timestamp': datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
+        errors['apis.{}.errors'.format(api_name)] = {'timestamp': datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
                                                 'response_time': rt}
-    dictionary['{}.most_recent_log'.format(api_name)] = {'active': active,
+    dictionary['apis.{}.most_recent_log'.format(api_name)] = {'active': active,
                                                          'response_time': rt}
 
 
@@ -132,11 +132,11 @@ def update_recent_log(most_recent, errors):
     hazard_active, hazard_rt = query_hazard_service(40.791859, -84.434, 30, 'http://hazards.skywatch.ai')
     skywatch_active, skywatch_rt = query_skywatch_api()
     airmap_active, airmap_rt = query_airmap()
-    db_active, db_rt = test_database()
+    # db_active, db_rt = test_database()
     add_api_data(most_recent, errors, 'hazard_api', hazard_active, hazard_rt)
     add_api_data(most_recent, errors, 'skywatch_api', skywatch_active, skywatch_rt)
     add_api_data(most_recent, errors, 'airmap_api', airmap_active, airmap_rt)
-    add_api_data(most_recent, errors, 'Database', db_active, db_rt)
+    # add_api_data(most_recent, errors, 'Database', db_active, db_rt)
     add_timestamp(most_recent)
 
 

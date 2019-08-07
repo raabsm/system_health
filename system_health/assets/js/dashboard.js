@@ -165,42 +165,31 @@ $().ready(function() {
     // Here is a function that calls and returns widgets for the api calls
     function ping() {
         $.getJSON("/api", function(data){
-            var apis = data['api'];
-            var i;
+            var apis = data['apis'];
             var result = "";
-            for (i = 0; i < apis.length; i++) {
-
-                if (apis[i]['info']['active']) {
+            for (var api_name in apis) {
+                if (apis[api_name]['most_recent_log']['active']) {
                     var sign = "<div style=\"font-size: 3rem;\"><i class=\"fa fa-circle text-success\"></i></div>";
                 }
                 else {
                     var sign = "<div style=\"font-size: 3rem;\"><i class=\"fa fa-circle text-danger\"></i></div>";
                 }
 
-                var response_time = apis[i]['info']['response_time'];
+                var response_time = apis[api_name]['most_recent_log']['response_time'];
                 response_time = parseFloat(response_time).toFixed(2);
                 response_time = response_time.toString();
+                var most_recent_error = "N/A";
+                if(apis[api_name]['errors'].length > 0){
+                    most_recent_error = apis[api_name]['errors'][0];
+                }
 
                 result = result + "<div class=\"col-md-2\"> <div class=\"card \"> <div class=\"card-body\">" +
-                 "<div class=\"widget\" id=\"api\"><h3>" + apis[i]['name'] + "</h3><p>Response time:<br>"+ response_time + " seconds</p>" + sign +
+                 "<div class=\"widget\" id=\"api\"><h3>" + api_name + "</h3><p>Response time:<br>"+ response_time +
+                 " seconds</p><p>Last Error:<br>"+ most_recent_error + "</p>" + sign +
                  "</div></div></div></div>";
             }
-            var current_datetime = new Date();
-            var hh = current_datetime.getHours()
-            var mm = current_datetime.getMinutes()
-            var ss = current_datetime.getSeconds()
-            if (hh < 10) {hh = "0"+hh;}
-            if (mm < 10) {mm = "0"+mm;}
-            if (ss < 10) {ss = "0"+ss;}
-            var today_string = hh+":"+mm+":"+ss;
+            past_errors = "API Widgets last updated " + data['timestamp'];
 
-            past_errors = "API Widgets last updated " + today_string
-
-            for (i = 0; i < data['errors'].length; i++) {
-                for(var key in data['errors'][i]){
-                    past_errors = past_errors + "<br>" + "Error: " + key + "--" + data['errors'][i][key]
-                }
-            }
             document.getElementById("ping").innerHTML = result + "<div"
             + "style=\"display: block; height: 25px; text-align:center; line-height:25px;\">"
             + past_errors + "</div>";
