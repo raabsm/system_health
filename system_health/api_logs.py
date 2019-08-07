@@ -119,7 +119,7 @@ def query_skywatch_api():
 def add_api_data(dictionary, errors, api_name, active, rt):
     if not active:
         errors['apis.{}.errors'.format(api_name)] = {'timestamp': datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
-                                                'response_time': rt}
+                                                     'response_time': rt}
     dictionary['apis.{}.most_recent_log'.format(api_name)] = {'active': active,
                                                          'response_time': rt}
 

@@ -147,11 +147,8 @@ $().ready(function() {
         policies();
         revenue();
         errors();
-    }, 120000);
+    }, 60000);
 
-    setInterval(function() {
-        $('#f1_card').toggleClass("transformStyle transformRotate");
-    }, 3000);
 
 
 
@@ -179,8 +176,9 @@ $().ready(function() {
                 response_time = parseFloat(response_time).toFixed(2);
                 response_time = response_time.toString();
                 var most_recent_error = "N/A";
-                if(apis[api_name]['errors'].length > 0){
-                    most_recent_error = apis[api_name]['errors'][0];
+                var error_length = apis[api_name]['errors'].length
+                if(error_length > 0){
+                    most_recent_error = apis[api_name]['errors'][error_length-1]['timestamp'];
                 }
 
                 result = result + "<div class=\"col-md-2\"> <div class=\"card \"> <div class=\"card-body\">" +
