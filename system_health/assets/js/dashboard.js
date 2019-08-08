@@ -82,10 +82,10 @@ $().ready(function() {
                 var month_link = "https://elasticsearch-us-prod.eastus.cloudapp.azure.com/app/kibana#/discover?_g=(refreshInterval:(pause:!t,value:0),time:(from:now-30d,mode:quick,to:now))&_a=(columns:!(_source),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'05010600-3079-11e9-962e-4b467b7ac4f3',key:level,negate:!t,params:(query:Warning,type:phrase),type:phrase,value:Warning),query:(match:(level:(query:Warning,type:phrase))))),index:'05010600-3079-11e9-962e-4b467b7ac4f3',interval:auto,query:(language:lucene,query:error),sort:!('@timestamp',desc))";
 
                 document.getElementById("error-info").innerHTML = "<div class=\"col-md-4\"><div><b>  Error count:</b></div><br>" +
-                    "<a href=" + day_link + "><div class=\"card \"><div class=\"card-body\"><div class=\"widget\" id=\"errors_24_hours\"" +
-                    "style=\"height: 180px;\"></div></div></div></a><a href=" + week_link + "><div class=\"card \"><div class=\"card-body\">" +
+                    "<a href=" + day_link + " target=\"_blank\"><div class=\"card \"><div class=\"card-body\"><div class=\"widget\" id=\"errors_24_hours\"" +
+                    "style=\"height: 180px;\"></div></div></div></a><a href=" + week_link + " target=\"_blank\"><div class=\"card \"><div class=\"card-body\">" +
                     "<div class=\"widget\" id=\"errors_last_week\" style=\"height: 180px;\"></div></div></div></a>" +
-                    "<a href=" + month_link + "><div class=\"card \"><div class=\"card-body\"><div class=\"widget\" id=\"errors_last_month\"" +
+                    "<a href=" + month_link + " target=\"_blank\"><div class=\"card \"><div class=\"card-body\"><div class=\"widget\" id=\"errors_last_month\"" +
                     "style=\"height: 180px;\"></div></div></div></div></a>" +
                     "<div class = \"col-md-8\" id=\"error_logs\"></div>"
 
@@ -127,7 +127,7 @@ $().ready(function() {
                 inner_text += "<p style=\"color: #ff0000 \"><b>" + key + ":</b> " + error[key] + "</p>";
             }
 
-            inner_text = "<a href=" + link + ">" + inner_text + "</a>";
+            inner_text = "<a href=" + link + " target=\"_blank\">" + inner_text + "</a>";
 
             $("#error_logs").append("<div class=\"card \"><div class=\"card-body\">" +
             inner_text + "</div></div>");
