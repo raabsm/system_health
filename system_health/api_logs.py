@@ -15,9 +15,9 @@ doc_id = "5d49785591ed6e2f4815a4de"
 def check_response(response):
     response_time = str(response.elapsed.total_seconds())
     if response.status_code != 200:
-        return False, response_time
+        return False, response_time, response.status_code
     else:
-        return True, response_time
+        return True, response_time, response.status_code
 
 
 def query_hazard_service(lat, lng, radius, url):
@@ -27,7 +27,7 @@ def query_hazard_service(lat, lng, radius, url):
                                  timeout=10)
         return check_response(response)
     except (requests.Timeout, requests.ConnectionError):
-        return False, 'TIMEOUT'
+        return False, 'TIMEOUT', None
 
 
 def query_database(query):
@@ -56,7 +56,7 @@ def test_database():
     else:
         active = False
         response_time = 0
-    return active, str(response_time)
+    return active, str(response_time), None
 
 
 def query_airmap():
@@ -68,7 +68,7 @@ def query_airmap():
     try:
         response = requests.request("GET", url, headers=headers, timeout=10)
     except (requests.Timeout, requests.ConnectionError):
-        return False, 'Timeout'
+        return False, 'Timeout', None
 
     return check_response(response)
 
@@ -107,21 +107,23 @@ def query_skywatch_api():
                 ]
             }
         },
-         "start_time": 9651096405567
+         "start_time": 965109640
     }
     try:
         response = response = requests.post(skywatch_api, json=data_to_input, timeout=10)
     except (requests.Timeout, requests.ConnectionError):
-        return False, 'Timeout'
+        return False, 'Timeout', None
     return check_response(response)
 
 
-def add_api_data(dictionary, errors, api_name, active, rt):
+def add_api_data(dictionary, errors, api_name, response_info):
+    active, rt, status_code = response_info
     if not active:
-        errors['apis.{}.errors'.format(api_name)] = {'timestamp': datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
-                                                     'response_time': rt}
-    dictionary['apis.{}.most_recent_log'.format(api_name)] = {'active': active,
-                                                         'response_time': rt}
+        errors[api_name] = {'response_time': rt}
+        if status_code is not None:
+             errors[api_name]['status_code'] = status_code
+    dictionary['most_recent_logs.{}'.format(api_name)] = {'active': active,
+                                                          'response_time': rt}
 
 
 def add_timestamp(dic):
@@ -129,14 +131,14 @@ def add_timestamp(dic):
 
 
 def update_recent_log(most_recent, errors):
-    hazard_active, hazard_rt = query_hazard_service(40.791859, -84.434, 30, 'http://hazards.skywatch.ai')
-    skywatch_active, skywatch_rt = query_skywatch_api()
-    airmap_active, airmap_rt = query_airmap()
-    # db_active, db_rt = test_database()
-    add_api_data(most_recent, errors, 'hazard_api', hazard_active, hazard_rt)
-    add_api_data(most_recent, errors, 'skywatch_api', skywatch_active, skywatch_rt)
-    add_api_data(most_recent, errors, 'airmap_api', airmap_active, airmap_rt)
-    # add_api_data(most_recent, errors, 'Database', db_active, db_rt)
+    hazard_response_info = query_hazard_service(40.791859, -84.434, 30, 'http://hazards.skywatch.ai')
+    skywatch_response_info = query_skywatch_api()
+    airmap_response_info = query_airmap()
+    db_response_info = test_database()
+    add_api_data(most_recent, errors, 'hazard_api', hazard_response_info)
+    add_api_data(most_recent, errors, 'skywatch_api', skywatch_response_info)
+    add_api_data(most_recent, errors, 'airmap_api', airmap_response_info)
+    add_api_data(most_recent, errors, 'Database', db_response_info)
     add_timestamp(most_recent)
 
 
@@ -145,7 +147,9 @@ def insert_into_db(most_recent, errors):
     db = connection['MyDatabase']
     collection = db['API_Logs']
     collection.update_one({'_id': ObjectId(doc_id)}, {"$set": most_recent})
-    collection.update_one({'_id': ObjectId(doc_id)}, {"$push": errors})
+    if len(errors) > 0:
+        collection.insert_one({'errors': errors,
+                               'timestamp': datetime.datetime.utcnow()})
 
 
 if __name__ == '__main__':
