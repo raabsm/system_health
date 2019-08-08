@@ -193,9 +193,12 @@ class RevenueHandler(tornado.web.RequestHandler):
 class ApiHandler(tornado.web.RequestHandler):
     def get(self):
         collection = mongo_db['API_Logs']
-        api_logs = collection.find_one({'_id': ObjectId(doc_id)})
-        del api_logs['_id']
-        self.write(api_logs)
+        most_recent_log = collection.find_one({'_id': ObjectId(doc_id)})
+        answer = collection.find({"errors": {"$exists": True}}).sort("timestamp", -1)
+        for i in answer:
+            print(i)
+        del most_recent_log['_id']
+        self.write(most_recent_log)
         
 
 class ErrorLogsHandler(tornado.web.RequestHandler):

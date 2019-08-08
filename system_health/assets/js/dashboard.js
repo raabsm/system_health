@@ -162,23 +162,23 @@ $().ready(function() {
     // Here is a function that calls and returns widgets for the api calls
     function ping() {
         $.getJSON("/api", function(data){
-            var apis = data['apis'];
+            var apis = data['most_recent_logs'];
             var result = "";
             for (var api_name in apis) {
-                if (apis[api_name]['most_recent_log']['active']) {
+                if (apis[api_name]['active']) {
                     var sign = "<div style=\"font-size: 3rem;\"><i class=\"fa fa-circle text-success\"></i></div>";
                 }
                 else {
                     var sign = "<div style=\"font-size: 3rem;\"><i class=\"fa fa-circle text-danger\"></i></div>";
                 }
 
-                var response_time = apis[api_name]['most_recent_log']['response_time'];
+                var response_time = apis[api_name]['response_time'];
                 response_time = parseFloat(response_time).toFixed(2);
                 response_time = response_time.toString();
                 var most_recent_error = "N/A";
-                var error_length = apis[api_name]['errors'].length
-                if(error_length > 0){
-                    most_recent_error = apis[api_name]['errors'][error_length-1]['timestamp'];
+                var error_time = data['most_recent_errors'][api_name]
+                if(error_time!=null){
+                    most_recent_error = error_time;
                 }
 
                 result = result + "<div class=\"col-md-2\"> <div class=\"card \"> <div class=\"card-body\">" +

@@ -41,7 +41,7 @@ def elastic_count(query, interval):
 # most recent logs this year
 def most_recent_logs(query):
     now = math.floor(time.time() * 1000)
-    last_time = now - (3 * day)
+    last_time = now - (7 * day)
     index = "prod-api-*"
 
     es = elasticsearch.Elasticsearch([db], http_auth=('kibana', 'SkyWatch123#@!'))

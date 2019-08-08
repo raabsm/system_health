@@ -107,7 +107,7 @@ def query_skywatch_api():
                 ]
             }
         },
-         "start_time": 965109640
+         "start_time": 9651096405776
     }
     try:
         response = response = requests.post(skywatch_api, json=data_to_input, timeout=10)
@@ -122,6 +122,7 @@ def add_api_data(dictionary, errors, api_name, response_info):
         errors[api_name] = {'response_time': rt}
         if status_code is not None:
              errors[api_name]['status_code'] = status_code
+        dictionary['most_recent_errors.{}'.format(api_name)] = datetime.datetime.today().strftime("%H:%M:%S") + " UTC"
     dictionary['most_recent_logs.{}'.format(api_name)] = {'active': active,
                                                           'response_time': rt}
 
@@ -146,10 +147,10 @@ def insert_into_db(most_recent, errors):
     connection = pymongo.MongoClient(uri)
     db = connection['MyDatabase']
     collection = db['API_Logs']
-    collection.update_one({'_id': ObjectId(doc_id)}, {"$set": most_recent})
     if len(errors) > 0:
         collection.insert_one({'errors': errors,
                                'timestamp': datetime.datetime.utcnow()})
+    collection.update_one({'_id': ObjectId(doc_id)}, {"$set": most_recent})
 
 
 if __name__ == '__main__':
