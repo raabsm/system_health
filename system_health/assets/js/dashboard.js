@@ -186,15 +186,45 @@ $().ready(function() {
 
             document.getElementById("ping").innerHTML = result + "<div"
             + "style=\"display: block; height: 25px; text-align:center; line-height:25px;\">"
-            + past_errors + "</div>";
+            + past_errors + "</div>"
+;
         })};
 
     ping();
 
 //    AGAIN, HERE AN INTERVAL IS SET (IN MILLISECONDS) IN ORDER TO CAUSE THE PAGE TO REFRESH PERIODICALLY
+
+    $("#ping").click(function(){
+       $("#ping_extended_info").toggle();
+       });
+
+    function advanced_api(){
+        $.getJSON("/advanced_api", function(apis){
+                var to_insert = "";
+                for (var api_name in apis){
+                    to_insert = to_insert + "<div class=\"col-md-3\"> <div class=\"card \"> <div class=\"card-body\">" +
+                               "<div class=\"widget\" id=\"api_error\">" +  "<h3>" + api_name + "</h3>"
+                    for(var i =0; i< apis[api_name].length; i++) {
+                        to_insert = to_insert + "<p><b>Response time:</b><br>"+ apis[api_name][i]['response_time'] +
+                         " seconds<br><b>Status Code:</b><br>"+ apis[api_name][i]['status_code'] + "<br><b>Timestamp:</b><br>"+ apis[api_name][i]['timestamp'] + "</p>";
+                     }
+                     to_insert = to_insert + "</div></div></div></div>";
+                }
+                document.getElementById("ping_extended_info").innerHTML = to_insert;
+           });
+       };
+
+    advanced_api();
+    $("#ping_extended_info").hide();
     setInterval(function() {
         ping();
     }, 60000);
+    setInterval(function() {
+        advanced_api();
+    }, 120000);
+
+
+
 
 //=====================================================================================================================//
 
