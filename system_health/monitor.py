@@ -194,12 +194,23 @@ class ApiHandler(tornado.web.RequestHandler):
     def get(self):
         collection = mongo_db['API_Logs']
         most_recent_log = collection.find_one({'_id': ObjectId(doc_id)})
-        answer = collection.find({"errors": {"$exists": True}}).sort("timestamp", -1)
-        for i in answer:
-            print(i)
         del most_recent_log['_id']
         self.write(most_recent_log)
-        
+
+
+class AdvancedApiHandler(tornado.web.RequestHandler):
+    def get(self):
+        collection = mongo_db['API_Logs']
+        two_days_ago = datetime.datetime.today() - datetime.timedelta(days=2)
+        answer = collection.find({"errors": {"$exists": True}, "timestamp": {"$gt": two_days_ago}}).sort('timestamp', -1).limit(30)
+        all_errors_by_api = {}
+        for log in answer:
+            for api_name in log['errors']:
+                entry = log['errors'][api_name]
+                entry['timestamp'] = log['timestamp'].strftime("%Y-%m-%d %H:%M:%S UTC")
+                all_errors_by_api.setdefault(api_name, []).append(entry)
+        self.write(all_errors_by_api)
+
 
 class ErrorLogsHandler(tornado.web.RequestHandler):
     def get(self):
@@ -224,6 +235,7 @@ def application():
                 (r"/api", ApiHandler),
                 (r"/graphs", GraphHandler),
                 (r"/errors", ErrorLogsHandler),
+                (r"/advanced_api", AdvancedApiHandler),
                 (r"/assets/css/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/css"},),
                 (r"/assets/img/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/img"},),
                 (r"/assets/js/(.*)", tornado.web.StaticFileHandler, {"path": "./assets/js"},),
