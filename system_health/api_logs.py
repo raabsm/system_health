@@ -122,13 +122,13 @@ def add_api_data(dictionary, errors, api_name, response_info):
         errors[api_name] = {'response_time': rt}
         if status_code is not None:
              errors[api_name]['status_code'] = status_code
-        dictionary['most_recent_errors.{}'.format(api_name)] = datetime.datetime.today().strftime("%H:%M:%S") + " UTC"
+        dictionary['most_recent_errors.{}'.format(api_name)] = datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S") + " UTC"
     dictionary['most_recent_logs.{}'.format(api_name)] = {'active': active,
                                                           'response_time': rt}
 
 
 def add_timestamp(dic):
-    dic['timestamp'] = datetime.datetime.today().strftime("%H:%M:%S") + " UTC"
+    dic['timestamp'] = datetime.datetime.utcnow().strftime("%H:%M:%S") + " UTC"
 
 
 def update_recent_log(most_recent, errors):
