@@ -8,7 +8,6 @@ from bson import ObjectId
 from dateutil.relativedelta import relativedelta
 import DBConnection
 import pytz
-import elasticlogs
 
 tornado.options.define('port', default=8888, help='port to listen on')
 
@@ -20,8 +19,8 @@ uri = "mongodb://health-dashboard-mongo:" \
 
 connection = pymongo.MongoClient(uri)
 mongo_db = connection['MyDatabase']
-doc_id = "5d49785591ed6e2f4815a4de"
-
+api_doc_id = "5d49785591ed6e2f4815a4de"
+error_doc_id = "5d515e868707ed00cc683d38"
 
 def format_number(entry):
     if entry is None:
@@ -193,7 +192,7 @@ class RevenueHandler(tornado.web.RequestHandler):
 class ApiHandler(tornado.web.RequestHandler):
     def get(self):
         collection = mongo_db['API_Logs']
-        most_recent_log = collection.find_one({'_id': ObjectId(doc_id)})
+        most_recent_log = collection.find_one({'_id': ObjectId(api_doc_id)})
         del most_recent_log['_id']
         self.write(most_recent_log)
 
@@ -214,16 +213,10 @@ class AdvancedApiHandler(tornado.web.RequestHandler):
 
 class ErrorLogsHandler(tornado.web.RequestHandler):
     def get(self):
-        query = "Level = Error, level = Error"
-        count_last_day = elasticlogs.elastic_day(query)
-        count_last_week = elasticlogs.elastic_week(query)
-        count_last_month = elasticlogs.elastic_month(query)
-        most_recent_logs = elasticlogs.most_recent_logs(query)
-        self.write({'count_last_day': count_last_day,
-                    'count_last_week': count_last_week,
-                    'count_last_month': count_last_month,
-                    'most_recent_logs': most_recent_logs})
-
+        collection = mongo_db['Service_Error_Logs']
+        most_recent_log = collection.find_one({'_id': ObjectId(error_doc_id)})
+        del most_recent_log['_id']
+        self.write(most_recent_log)
 
 # launch url according to input path
 def application():
