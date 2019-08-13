@@ -3,20 +3,24 @@ import time
 import math
 import pymongo
 from bson import ObjectId
+import system_health.US_Constants as US_constants
+import system_health.UK_Constants as UK_constants
 
-db = "http://elasticsearch-us-prod.eastus.cloudapp.azure.com:9200/"
-
-doc_id = "5d515e868707ed00cc683d38"
-
-uri = "mongodb://health-dashboard-mongo:" \
-      "2unhwWjCwN1KaLWRmBPRbrIu6yNmax5A2FlHycleFjH65pB9sTvYJrU9ihMeUIbA2hpJehgmwa0tJUgsQHB5zw" \
-      "==@health-dashboard-mongo.documents.azure.com:10255/?ssl=true&replicaSet=globaldb"
+uri = US_constants.uri
 
 day = 86400000
 week = 604800000
 month = 2592000000
 
-es = elasticsearch.Elasticsearch([db], http_auth=('kibana', 'SkyWatch123#@!'))
+
+def init_db(country):
+    global db
+    global es
+    if country == "US":
+        db = US_constants.error_db
+    else:
+        db = UK_constants.error_db
+    es = elasticsearch.Elasticsearch([db], http_auth=('kibana', 'SkyWatch123#@!'))
 
 
 def elastic_day(query):
@@ -57,7 +61,7 @@ def most_recent_logs(query):
 
     three_recent_logs = []
     list_of_logs = response["hits"]["hits"]
-    for i in range(6):
+    for i in (range(6) if len(list_of_logs) > 6 else range(len(list_of_logs))):
         stamp = list_of_logs[i]["_source"]["@timestamp"]
         stamp = stamp[:stamp.find(".")].replace("T", " ")
         stamp += " UTC"
@@ -212,22 +216,30 @@ def elastic_query(old_time, now, query):
     }
 
 
-def insert_into_mongo(document):
+def insert_into_mongo(document, doc_id):
     connection = pymongo.MongoClient(uri)
     mongo_db = connection['MyDatabase']
     collection = mongo_db['Service_Error_Logs']
-    doc = collection.update_one({'_id': ObjectId(doc_id)}, {"$set": document})
-    print(doc)
+    collection.update_one({'_id': ObjectId(doc_id)}, {"$set": document})
+
+
+def fill_data(query):
+    count_last_day = elastic_day(query)
+    count_last_week = elastic_week(query)
+    count_last_month = elastic_month(query)
+    recent_logs = most_recent_logs(query)
+    document = {'count_last_day': count_last_day,
+                'count_last_week': count_last_week,
+                'count_last_month': count_last_month,
+                'most_recent_logs': recent_logs}
+    return document
 
 
 if __name__ == "__main__":
     query = "Level = Error, level = Error"
-    count_last_day = elastic_day(query)
-    count_last_week = elastic_week(query)
-    count_last_month = elastic_month(query)
-    most_recent_logs = most_recent_logs(query)
-    document = {'count_last_day': count_last_day,
-                'count_last_week': count_last_week,
-                'count_last_month': count_last_month,
-                'most_recent_logs': most_recent_logs}
-    insert_into_mongo(document)
+    init_db("US")
+    us_data = fill_data(query)
+    init_db("UK")
+    uk_data = fill_data(query)
+    insert_into_mongo(us_data, US_constants.error_doc_id)
+    insert_into_mongo(uk_data, UK_constants.error_doc_id)
