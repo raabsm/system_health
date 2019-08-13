@@ -6,21 +6,26 @@ import datetime
 import pymongo
 from bson import ObjectId
 from dateutil.relativedelta import relativedelta
-import DBConnection
+import system_health.DBConnection as DBConnection
 import pytz
+#change import for whichever dashboard to run
+import system_health.UK_Constants as constants
+#import system_health.US_Constants as constants
 
-tornado.options.define('port', default=8888, help='port to listen on')
 
-currency = "$"
+tornado.options.define('port', default=constants.port, help='port to listen on')
 
-uri = "mongodb://health-dashboard-mongo:" \
-      "2unhwWjCwN1KaLWRmBPRbrIu6yNmax5A2FlHycleFjH65pB9sTvYJrU9ihMeUIbA2hpJehgmwa0tJUgsQHB5zw" \
-      "==@health-dashboard-mongo.documents.azure.com:10255/?ssl=true&replicaSet=globaldb"
+currency = constants.currency
+
+uri = constants.uri
 
 connection = pymongo.MongoClient(uri)
 mongo_db = connection['MyDatabase']
-api_doc_id = "5d49785591ed6e2f4815a4de"
-error_doc_id = "5d515e868707ed00cc683d38"
+api_doc_id = constants.api_doc_id
+error_doc_id = constants.error_doc_id
+
+sql_db_connection = DBConnection.DBConnection(constants.prod_connection_string)
+
 
 def format_number(entry):
     if entry is None:
@@ -39,14 +44,14 @@ def format_time(time):
 
 
 def query_database_single_response(query):
-    response = DBConnection.get_all_responses(query)
+    response = sql_db_connection.get_all_responses(query)
     if response is None:
         return None
     return response[0][0]
 
 
 def query_database_all_responses(query):
-    response = DBConnection.get_all_responses(query)
+    response = sql_db_connection.get_all_responses(query)
     if response is None:
         return None
     return response
@@ -68,7 +73,7 @@ class DBError(Exception):
 class jsHandler(tornado.web.RequestHandler):
     def get(self):
         try:
-            self.render("dashboard.html")
+            self.render("dashboard.html", country=constants.country_full_name)
         except Exception as e:
             print(e.message, "Could not render the page")
 
@@ -201,7 +206,7 @@ class AdvancedApiHandler(tornado.web.RequestHandler):
     def get(self):
         collection = mongo_db['API_Logs']
         two_days_ago = datetime.datetime.today() - datetime.timedelta(days=2)
-        answer = collection.find({"errors": {"$exists": True}, "timestamp": {"$gt": two_days_ago}}).sort('timestamp', -1).limit(30)
+        answer = collection.find({"errors": {"$exists": True}, "country": constants.country_db_name, "timestamp": {"$gt": two_days_ago}}).sort('timestamp', -1).limit(30)
         all_errors_by_api = {}
         for log in answer:
             for api_name in log['errors']:

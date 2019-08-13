@@ -4,12 +4,8 @@ import time
 import psycopg2
 import datetime
 from bson import ObjectId
-
-uri = "mongodb://health-dashboard-mongo:" \
-      "2unhwWjCwN1KaLWRmBPRbrIu6yNmax5A2FlHycleFjH65pB9sTvYJrU9ihMeUIbA2hpJehgmwa0tJUgsQHB5zw" \
-      "==@health-dashboard-mongo.documents.azure.com:10255/?ssl=true&replicaSet=globaldb"
-
-doc_id = "5d49785591ed6e2f4815a4de"
+import system_health.US_Constants as US_constants
+import system_health.UK_Constants as UK_constants
 
 
 def check_response(response):
@@ -30,12 +26,9 @@ def query_hazard_service(lat, lng, radius, url):
         return False, 'TIMEOUT', None
 
 
-def query_database(query):
-    prod_connection_string = "dbname='skywatch_prod' user='skywatch@skywatchdb-prod.postgres.database.azure.com' " \
-                             "host='skywatchdb-prod.postgres.database.azure.com' password='SkyWatch1234'"
-
+def query_database(prod_string, query):
     conn = psycopg2.connect(
-        prod_connection_string,
+        prod_string,
         sslmode='require')
     cursor = conn.cursor()
     try:
@@ -45,10 +38,11 @@ def query_database(query):
     except:
         return None
 
-def test_database():
+
+def test_database(prod_string):
     example_query = 'SELECT id FROM "Insurance"."insurance_policies" LIMIT 1'
     start_time = time.time()
-    response = query_database(example_query)
+    response = query_database(prod_string, example_query)
     end_time = time.time()
     if response is not None:
         active = True
@@ -73,8 +67,8 @@ def query_airmap():
     return check_response(response)
 
 
-def query_skywatch_api():
-    skywatch_api = 'http://api.us-dev.skywatch.ai/api/insurances/offers'
+def query_skywatch_api(url):
+    skywatch_api = url
     data_to_input = {
         "airspace": {
             "type": "Feature",
@@ -110,7 +104,7 @@ def query_skywatch_api():
          "start_time": 9651096405776
     }
     try:
-        response = response = requests.post(skywatch_api, json=data_to_input, timeout=10)
+        response = requests.post(skywatch_api, json=data_to_input, timeout=10)
     except (requests.Timeout, requests.ConnectionError):
         return False, 'Timeout', None
     return check_response(response)
@@ -131,33 +125,51 @@ def add_timestamp(dic):
     dic['timestamp'] = datetime.datetime.utcnow().strftime("%H:%M:%S") + " UTC"
 
 
-def update_recent_log(most_recent, errors):
+def update_recent_log_us(log, errors):
     hazard_response_info = query_hazard_service(40.791859, -84.434, 30, 'http://hazards.skywatch.ai')
-    skywatch_response_info = query_skywatch_api()
+    skywatch_response_info = query_skywatch_api('https://api.skywatch.ai/api/insurances/offers')
     airmap_response_info = query_airmap()
-    db_response_info = test_database()
-    add_api_data(most_recent, errors, 'hazard_api', hazard_response_info)
-    add_api_data(most_recent, errors, 'skywatch_api', skywatch_response_info)
-    add_api_data(most_recent, errors, 'airmap_api', airmap_response_info)
-    add_api_data(most_recent, errors, 'Database', db_response_info)
-    add_timestamp(most_recent)
+    db_response_info = test_database(US_constants.prod_connection_string)
+    add_api_data(log, errors, 'hazard_api', hazard_response_info)
+    add_api_data(log, errors, 'skywatch_api', skywatch_response_info)
+    add_api_data(log, errors, 'airmap_api', airmap_response_info)
+    add_api_data(log, errors, 'Database', db_response_info)
+    add_timestamp(log)
 
 
-def insert_into_db(most_recent, errors):
-    connection = pymongo.MongoClient(uri)
+def update_recent_log_uk(log, errors):
+    hazard_response_info = query_hazard_service(40.791859, -84.434, 30, 'http://40.68.131.122')
+    skywatch_response_info = query_skywatch_api('https://skywatch-stack-prod-uk.westeurope.cloudapp.azure.com/api/insurances/offers')
+    db_response_info = test_database(UK_constants.prod_connection_string)
+    add_api_data(log, errors, 'hazard_api', hazard_response_info)
+    add_api_data(log, errors, 'skywatch_api', skywatch_response_info)
+    add_api_data(log, errors, 'Database', db_response_info)
+    add_timestamp(log)
+
+
+def insert_into_db(most_recent, errors, country):
+    if country == "US":
+        doc_id = US_constants.api_doc_id
+    else:
+        doc_id = UK_constants.api_doc_id
+    connection = pymongo.MongoClient(US_constants.uri)
     db = connection['MyDatabase']
     collection = db['API_Logs']
     if len(errors) > 0:
         collection.insert_one({'errors': errors,
+                               'country': country,
                                'timestamp': datetime.datetime.utcnow()})
     collection.update_one({'_id': ObjectId(doc_id)}, {"$set": most_recent})
 
 
 if __name__ == '__main__':
-    most_recent_data = {}
-    api_errors = {}
-    update_recent_log(most_recent_data, api_errors)
-    insert_into_db(most_recent_data, api_errors)
-
+    most_recent_data_us = {}
+    api_errors_us = {}
+    most_recent_data_uk = {}
+    api_errors_uk = {}
+    update_recent_log_us(most_recent_data_us, api_errors_us)
+    insert_into_db(most_recent_data_us, api_errors_us, "US")
+    update_recent_log_uk(most_recent_data_uk, api_errors_uk)
+    insert_into_db(most_recent_data_uk, api_errors_uk, "UK")
 
 
