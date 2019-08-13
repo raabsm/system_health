@@ -183,12 +183,11 @@ $().ready(function() {
                  "</div></div></div></div>";
             }
             past_errors = "API Widgets last updated " + data['timestamp'];
-
             document.getElementById("ping").innerHTML = result + "<div"
             + "style=\"display: block; height: 25px; text-align:center; line-height:25px;\">"
-            + past_errors + "</div>"
-;
-        })};
+            + past_errors + "</div>";
+        });
+        };
 
     ping();
 
@@ -407,70 +406,69 @@ demo = {
 
     initDashboardPageCharts: function() {
         $.getJSON("/graphs", function(response){
-
-
             var dict = response['graphs'];
+            document.getElementById("bar-charts").innerHTML = "";
 
             for(var key in dict) {
 
-            var val = dict[key];
+                var val = dict[key];
 
-            var info = val['data'].reverse();
-            var data_labels = [];
-            var data_series = [[], [], []];
-            var j;
+                var info = val['data'].reverse();
+                var data_labels = [];
+                var data_series = [[], [], []];
+                var j;
 
-            for (j = 0; j < info.length; j++) {
-                data_labels[j] = info[j]["x"];
-                data_series[0][j] = info[j]["y1"];
-                if("y2" in info[j]) {
-                    data_series[1][j] = info[j]["y2"];
-                }
-                if("y3" in info[j]) {
-                    data_series[2][j] = info[j]["y3"];
-                }
-            }
-
-            var data = {labels: data_labels, series: data_series};
-
-            var options = {
-                seriesBarDistance: 10,
-                axisX: {
-                    showGrid: false
-                },
-                height: "245px"
-            };
-
-            var responsiveOptions = [
-                ['screen and (max-width: 640px)', {
-                    seriesBarDistance: 5,
-                    axisX: {
-                        labelInterpolationFnc: function(value) {
-                            return value[0];
-                        }
+                for (j = 0; j < info.length; j++) {
+                    data_labels[j] = info[j]["x"];
+                    data_series[0][j] = info[j]["y1"];
+                    if("y2" in info[j]) {
+                        data_series[1][j] = info[j]["y2"];
                     }
-                }]
-            ];
+                    if("y3" in info[j]) {
+                        data_series[2][j] = info[j]["y3"];
+                    }
+                }
 
-            var second_val = "";
-            var third_val = "";
-            if('y2' in val['key']) {
-                second_val = "<i class=\"fa fa-circle text-danger\" ></i>" + val['key']['y2'];
-            }
-            if('y3' in val['key']) {
-                third_val = "<i class=\"fa fa-circle text-warning\"></i>" + val['key']['y3'];
-            }
+                var data = {labels: data_labels, series: data_series};
+
+                var options = {
+                    seriesBarDistance: 10,
+                    axisX: {
+                        showGrid: false
+                    },
+                    height: "245px"
+                };
+
+                var responsiveOptions = [
+                    ['screen and (max-width: 640px)', {
+                        seriesBarDistance: 5,
+                        axisX: {
+                            labelInterpolationFnc: function(value) {
+                                return value[0];
+                            }
+                        }
+                    }]
+                ];
+
+                var second_val = "";
+                var third_val = "";
+                if('y2' in val['key']) {
+                    second_val = "<i class=\"fa fa-circle text-danger\" ></i>" + val['key']['y2'];
+                }
+                if('y3' in val['key']) {
+                    third_val = "<i class=\"fa fa-circle text-warning\"></i>" + val['key']['y3'];
+                }
 
 
-            var id = "chartActivity" + key;
-            $("#bar-charts").append("<div class=\"col-md-6\"><div class=\"card \">" +
-            "<div class=\"card-header \"><h4 class=\"card-title\">" + val['title'] +"</h4></div><div class=\"card-body \" id=\"chart\">"+
-            "<div id=\"" + id + "\" class=\"ct-chart\"></div></div><br><div class=\"card-footer \">" +
-            "<i class=\"fa fa-circle text-info\"></i>" + val['key']['y1'] + second_val + third_val + "<hr>" +
-            "<div class=\"stats\"><i class=\"fa fa-check\"></i> Data information certified</div>" +
-            "</div></div></div>");
-            id = "#" + id;
-            var chartActivity = Chartist.Bar(id, data, options, responsiveOptions);
+                var id = "chartActivity" + key;
+                $("#bar-charts").append("<div class=\"col-md-6\"><div class=\"card \">" +
+                "<div class=\"card-header \"><h4 class=\"card-title\">" + val['title'] +"</h4></div><div class=\"card-body \" id=\"chart\">"+
+                "<div id=\"" + id + "\" class=\"ct-chart\"></div></div><br><div class=\"card-footer \">" +
+                "<i class=\"fa fa-circle text-info\"></i>" + val['key']['y1'] + second_val + third_val + "<hr>" +
+                "<div class=\"stats\"><i class=\"fa fa-check\"></i> Data information certified</div>" +
+                "</div></div></div>");
+                id = "#" + id;
+                var chartActivity = Chartist.Bar(id, data, options, responsiveOptions);
             }
 
             var dataPreferences = {
