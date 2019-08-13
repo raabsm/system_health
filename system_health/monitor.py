@@ -6,14 +6,20 @@ import datetime
 import pymongo
 from bson import ObjectId
 from dateutil.relativedelta import relativedelta
-import system_health.DBConnection as DBConnection
+import DBConnection as DBConnection
 import pytz
-#change import for whichever dashboard to run
-import system_health.UK_Constants as constants
-#import system_health.US_Constants as constants
+import argparse
+
+parser = argparse.ArgumentParser(description="Dashboard")
+parser.add_argument('--country', nargs=1, type=str, default="US")
+args = parser.parse_args()
+if args.country[0] == "US":
+    import US_Constants as constants
+else:
+    import UK_Constants as constants
 
 
-tornado.options.define('port', default=constants.port, help='port to listen on')
+#tornado.options.define('port', default=constants.port, help='port to listen on')
 
 currency = constants.currency
 
@@ -249,8 +255,8 @@ if __name__ == "__main__":
     try:
         app = application()
         http_server = tornado.httpserver.HTTPServer(app)
-        http_server.listen(tornado.options.options.port)
-        print("Success; listening on http://localhost:%i" % tornado.options.options.port)
+        app.listen(constants.port)
+        print("Success; listening on http://localhost:%i" % constants.port)
         tornado.ioloop.IOLoop.current().start()
     except Exception as e:
         print(e)
