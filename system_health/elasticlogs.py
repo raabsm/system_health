@@ -3,8 +3,8 @@ import time
 import math
 import pymongo
 from bson import ObjectId
-import system_health.US_Constants as US_constants
-import system_health.UK_Constants as UK_constants
+import US_Constants as US_constants
+import UK_Constants as UK_constants
 
 uri = US_constants.uri
 
