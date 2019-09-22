@@ -1,6 +1,6 @@
 **System Health & Monitoring**
 
-Here is a scalable dashboard created in order to streamline the monitoring of both the health of VOOM's software 
+Here is a scalable dashboard created in order to streamline the monitoring of both the health of VOOM's software
 infrastructure and the growth of their company.
 
 Python web framework: **Tornado**.
@@ -10,11 +10,11 @@ Information was pulled from SkyWatch's **Azure database** and from their **ELK s
 The design of the site was based on the [Light Bootstrap Dashboard template](https://demos.creative-tim.com/light-bootstrap-dashboard/).
 
 
-Most of the front end work is handled in the JavaScript file named "dashboard.js" (File path: 
-_\systemmonitor\system_health\assets\js\dashboard.js_). 
-The file is split into 3 sections: 
-(1) Meta Widgets, 
-(2) Ping Widgets, 
+Most of the front end work is handled in the JavaScript file named "dashboard.js" (File path:
+_\systemmonitor\system_health\assets\js\dashboard.js_).
+The file is split into 3 sections:
+(1) Meta Widgets,
+(2) Ping Widgets,
 (3) Graphs.
 
 **To add a row, to add widgets, to change size of divs, etc:**
@@ -32,7 +32,7 @@ Each topic has its own handler:
 If the widget you want to add falls under any of these topics, then it suffices to modify the code under each class
 accordingly.
 
-You might want to modify the front end. As previously mentioned, the js file is split into three sections. It is 
+You might want to modify the front end. As previously mentioned, the js file is split into three sections. It is
 up to you to gauge within which section the widget should be formatted. NB: once you create a function that returns the
 widget, be sure to set a time interval so that the information self-refreshes.
 
